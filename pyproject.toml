@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "proekt"
+version = "0.1.0"
+description = ""
+authors = ["olhaishchenko <olga.ua.olga@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.95.1"
+sqlalchemy = "^2.0.13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
