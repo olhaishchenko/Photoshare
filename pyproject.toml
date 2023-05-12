@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "photoshare"
+version = "0.1.0"
+description = ""
+authors = ["VOliinyk1 <vov.25.98@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.95.1"
+pydantic = {extras = ["email"], version = "^1.10.7"}
+psycopg2 = "^2.9.6"
+alembic = "^1.10.4"
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
+redis = "^4.5.5"
+fastapi-limiter = "^0.1.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
