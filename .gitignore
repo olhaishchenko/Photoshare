@@ -1,5 +1,6 @@
-
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/misc.xml
 .idea/vcs.xml
 .idea/workspace.xml
+
+poetry.lock

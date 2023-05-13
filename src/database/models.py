@@ -12,7 +12,7 @@ class Role(enum.Enum):
     user: str = 'user'
 
 tags_images = Table('tags_images', Base.metadata,
-    Column('image_id', ForeignKey('image.id'), primary_key=True),
+    Column('image_id', ForeignKey('images.id'), primary_key=True),
     Column('tag_id', ForeignKey('tags.id'), primary_key=True)
 )
 
@@ -32,7 +32,7 @@ class Rating(Base):
     __tablename__ = "ratings"
     id = Column(Integer, primary_key=True, index=True)
     rating = Column(Integer)
-    image_id = Column(Integer, ForeignKey("image.id"), nullable=True)
+    image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
     image = relationship('Image', backref="comments")
 
 
@@ -42,9 +42,9 @@ class Comment(Base):
     comment = Column(String, nullable=False)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship('User', backref="comments")
-    image_id = Column(Integer, ForeignKey("image.id"), nullable=True)
+    image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
     image = relationship('Image', backref="comments")
 
 
@@ -57,5 +57,6 @@ class User(Base):
     avatar = Column(String(355), nullable=True)
     refresh_token = Column(String(255), nullable=True)
     roles = Column('roles', Enum(Role), default=Role.user)
+    created_at = Column(DateTime, default=func.now())
     confirmed = Column(Boolean, default=False)
     is_aсtive = Column(Boolean, default=True)
