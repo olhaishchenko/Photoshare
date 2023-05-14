@@ -7,20 +7,21 @@ import redis.asyncio as redis
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.config.config import settings
+from src.routes import auth, users
 from src.database.db import get_db
 
 app = FastAPI()
 
 
-# @app.on_event("startup")
-# async def startup():
-#     """
-#     Set limitation of requests on server
-#
-#     :return: None
-#     """
-#     r = await redis.Redis(host=settings.redis_host, port=settings.redis_port, db=0)
-#     await FastAPILimiter.init(r)
+@app.on_event("startup")
+async def startup():
+    """
+    Set limitation of requests on server
+
+    :return: None
+    """
+    r = await redis.Redis(host=settings.redis_host, port=settings.redis_port, db=0)
+    await FastAPILimiter.init(r)
 
 
 app.add_middleware(
@@ -63,5 +64,9 @@ def healthchecker(db: Session = Depends(get_db)):
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error connecting to database")
+
+
+app.include_router(auth.router, prefix='/api')
+app.include_router(users.router, prefix='/api')
 
 # TODO: Add all routes in app

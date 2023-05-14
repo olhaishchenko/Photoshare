@@ -59,4 +59,4 @@ class User(Base):
     roles = Column('roles', Enum(Role), default=Role.user)
     created_at = Column(DateTime, default=func.now())
     confirmed = Column(Boolean, default=False)
-    is_aсtive = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=True)
