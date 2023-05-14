@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.config.config import settings
 from src.database.db import get_db
+from src.routes import users
 
 app = FastAPI()
 
@@ -64,4 +65,6 @@ def healthchecker(db: Session = Depends(get_db)):
         print(e)
         raise HTTPException(status_code=500, detail="Error connecting to database")
 
+
 # TODO: Add all routes in app
+app.include_router(users.user_router, prefix='/api')
