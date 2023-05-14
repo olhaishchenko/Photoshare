@@ -33,7 +33,7 @@ class Rating(Base):
     id = Column(Integer, primary_key=True, index=True)
     rating = Column(Integer)
     image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
-    image = relationship('Image', backref="comments")
+    image = relationship('Image', backref="ratings")
 
 
 class Comment(Base):
