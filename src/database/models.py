@@ -1,6 +1,8 @@
 import enum
 
-from sqlalchemy import Boolean, Column, Integer, String, Date, Enum, ForeignKey, DateTime, Table, func
+
+from sqlalchemy import Boolean, Column, Table, Integer, String, Date, Enum, ForeignKey, DateTime, func
+
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -11,10 +13,12 @@ class Role(enum.Enum):
     moderator: str = 'moderator'
     user: str = 'user'
 
+
+
 tags_images = Table('tags_images', Base.metadata,
-    Column('image_id', ForeignKey('images.id'), primary_key=True),
-    Column('tag_id', ForeignKey('tags.id'), primary_key=True)
-)
+                    Column('image_id', ForeignKey('images.id'), primary_key=True),
+                    Column('tag_id', ForeignKey('tags.id'), primary_key=True)
+                    )
 
 class Image(Base):
     __tablename__ = "images"
@@ -28,12 +32,11 @@ class Tag(Base):
     id = Column(Integer, primary_key=True, index=True)
     tag = Column(String, unique=True)
 
-class Rating(Base):
-    __tablename__ = "ratings"
-    id = Column(Integer, primary_key=True, index=True)
-    rating = Column(Integer)
-    image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
-    image = relationship('Image', backref="ratings")
+# class Rating(Base):
+#     __tablename__ = "ratings"
+#     id = Column(Integer, primary_key=True, index=True)
+#     rating = Column(Integer)
+#     image = relationship('Image', backref="ratings")
 
 
 class Comment(Base):
@@ -48,6 +51,19 @@ class Comment(Base):
     image = relationship('Image', backref="comments")
 
 
+
+# class Comment(Base):
+#     __tablename__ = "comments"
+#     id = Column(Integer, primary_key=True, index=True)
+#     comment = Column(String, nullable=False)
+#     created_at = Column(DateTime, default=func.now())
+#     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+#     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+#     user = relationship('User', backref="comments")
+#     image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
+#     image = relationship('Image', backref="comments")
+
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -60,3 +76,6 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
     confirmed = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
+
+
+
