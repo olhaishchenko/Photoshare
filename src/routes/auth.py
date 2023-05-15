@@ -35,7 +35,7 @@ async def signup(body: UserModel, background_tasks: BackgroundTasks, request: Re
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail.ACCOUNT_AlREADY_EXISTS)
     body.password = auth_service.get_password_hash(body.password)
     new_user = await repository_users.create_user(body, db)
-    background_tasks.add_task(send_email, new_user.email, new_user.username, str(request.base_url))
+    # background_tasks.add_task(send_email, new_user.email, new_user.username, str(request.base_url))
     return {"user": new_user, "detail": detail.SUCCESS_CREATE_USER}
 
 
@@ -53,11 +53,11 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     user = await repository_users.get_user_by_email(body.username, db)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail.INVALID_EMAIL)
-    if not user.confirmed:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail.EMAIL_NOT_CONFIRMED)
+    # if not user.confirmed:
+    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail.EMAIL_NOT_CONFIRMED)
     # Check is_active
-    # if not user.is_active:
-    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=detail.USER_NOT_ACTIVE)
+    if not user.is_active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=detail.USER_NOT_ACTIVE)
     if not auth_service.verify_password(body.password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail.INVALID_PASSWORD)
 

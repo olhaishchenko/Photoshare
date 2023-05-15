@@ -2,7 +2,7 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    sqlalchemy_database_url: str = 'postgresql+psycopg2://postgres:1234@localhost:5432/postgres'
+    sqlalchemy_database_url: str = 'postgresql+psycopg2://postgres:1234@localhost:5432/postgres_users'
     secret_key: str = 'secret_key'
     algorithm: str = 'HS256'
     mail_username: str = 'example@meta.ua'

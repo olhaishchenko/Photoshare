@@ -46,6 +46,6 @@ async def send_email(email: EmailStr, username: str, host: str):
         )
 
         fm = FastMail(conf)
-        await fm.send_message(message, template_name="email_template.html")
+        # await fm.send_message(message, template_name="email_template.html")
     except ConnectionErrors as err:
         print(err)
