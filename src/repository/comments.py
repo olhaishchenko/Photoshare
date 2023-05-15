@@ -10,9 +10,6 @@ from src.schemas import CommentBase
 async def add_comment(image_id: int, body: CommentBase, db: Session, user: User) -> Comment:
     """
     Adds a new comment to the database.
-    Args:
-        image_id (int): The id of the image to which this comment belongs.
-        body (CommentBase): A CommentBase object containing information about the new comment.
 
     :param image_id: int: Identify the image that the comment is being added to
     :param body: CommentBase: Specify the type of data that is expected to be passed in
@@ -30,9 +27,6 @@ async def add_comment(image_id: int, body: CommentBase, db: Session, user: User)
 async def edit_comment(comment_id: int, body: CommentBase, db: Session, user: User) -> Comment | None:
     """
     Allows a user to edit their own comment.
-    Args:
-        comment_id (int): The id of the comment that is being edited.
-        body (CommentBase): The new text for the comment.
 
     :param comment_id: int: Find the comment in the database
     :param body: CommentBase: Pass the data from the request body to this function
@@ -52,10 +46,6 @@ async def edit_comment(comment_id: int, body: CommentBase, db: Session, user: Us
 async def delete_comment(comment_id: int, db: Session, user: User) -> None:
     """
     Deletes a comment from the database. The comment can be deleted by Admin and Moderator
-    Args:
-        comment_id (int): The id of the comment to be deleted.
-        db (Session): A connection to the database.
-        user (User): The user who is deleting this comment.
 
     :param comment_id: int: Identify the comment to be deleted
     :param db: Session: Connect to the database
@@ -73,10 +63,6 @@ async def delete_comment(comment_id: int, db: Session, user: User) -> None:
 async def get_comment_by_id(comment_id: int, db: Session, user: User) -> Comment | None:
     """
     Returns a comment from the database by comment_id.
-    Args:
-        comment_id (int): The id of the comment to be returned.
-        db (Session): A connection to the database.
-        user (User): The currently logged-in user.
 
     :param comment_id: int: Specify the id of the comment that we want to retrieve
     :param db: Session: Access the database
@@ -101,9 +87,6 @@ async def get_comments_by_user_id(user_id: int, db: Session) -> List[Comment] | 
 async def get_user_comments_by_image(user_id: int, image_id: int, db: Session) -> List[Comment] | None:
     """
     Returns a list of comments for a given user and image.
-    Args:
-        user_id (int): The id of the user whose comments are being retrieved.
-        image_id (int): The id of the image whose comments are being retrieved.
 
     :param user_id: int: Filter the comments by user_id
     :param image_id: int: Filter the comments by image_id
@@ -112,3 +95,13 @@ async def get_user_comments_by_image(user_id: int, image_id: int, db: Session) -
     """
     return db.query(Comment).filter(and_(Comment.user_id == user_id, Comment.image_id == image_id)).all()
 
+
+async def get_image_comments(image_id: int, db: Session) -> List[Comment]:
+    """
+    Returns a list of comments for the specified image_id.
+
+    :param image_id: int: Filter the comments by image_id
+    :param db: Session: Pass the database session to the function
+    :return: A list of comments for a given image
+    """
+    return db.query(Comment).filter(Comment.image_id == image_id).all()
