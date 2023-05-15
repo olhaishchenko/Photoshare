@@ -7,21 +7,22 @@
 5. Отримання поточного юзера
 6. Отримання email з токена підтвердження
 """
-import pickle
 
 from datetime import datetime, timedelta
 from typing import Optional
+import pickle
+import redis
 
-import redis as redis
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from passlib.context import CryptContext
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-
-from src.database.db import get_db
+from jose import JWTError, jwt
 from src.config import detail
+
 from src.config.config import settings
+from src.database.db import get_db
+
 from src.repository import users as repository_users
 
 
