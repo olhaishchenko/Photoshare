@@ -10,6 +10,3 @@ poetry.lock
 .idea/Photoshare.iml
 __pycache__
 *.pyc
-
-*.pyc
-*.xml

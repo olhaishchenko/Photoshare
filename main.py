@@ -9,7 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.config.config import settings
 from src.routes import auth, users, comments
 from src.database.db import get_db
-from src.routes import users
 
 app = FastAPI()
 
