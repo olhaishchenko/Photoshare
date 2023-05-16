@@ -34,6 +34,16 @@ class UserResponse(BaseModel):
     class Config:
         orm_mode = True
 
+# class UserModelProfile(BaseModel):
+#     username: str
+#     email: str
+#     avatar: str
+#     is_active: bool
+#     created_at: datetime
+#     post_count: int
+#     comment_count: int
+#     rates_count: int
+
 
 class TokenModel(BaseModel):
     access_token: str

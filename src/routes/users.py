@@ -1,9 +1,9 @@
-
 from fastapi import APIRouter, Depends
 
 from src.database.models import User
 from src.services.auth import auth_service
 from src.schemas import UserResponse
+# from src.services.roles import RoleAccess
 
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -22,6 +22,12 @@ user_router = APIRouter(prefix="/user", tags=['users'])
 
 security = HTTPBearer()
 
+# allowed_get_user = RoleAccess([Role.admin, Role.moder, Role.user])
+# allowed_create_user = RoleAccess([Role.admin, Role.moder, Role.user])
+# allowed_get_all_users = RoleAccess([Role.admin])
+# allowed_remove_user = RoleAccess([Role.admin])
+# allowed_ban_user = RoleAccess([Role.admin])
+# allowed_change_user_role = RoleAccess([Role.admin])
 
 @user_router.get("/me/", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
@@ -98,3 +104,54 @@ async def ban_user(id_, db: Session = Depends(get_db), current_user: User = Depe
         raise HTTPException(status_code=403, detail=PRIVILEGES_DENIED)
     banned_user = await repository_users.ban_user(id_, db)
     return {"user": banned_user, "detail": USER_BANNED}
+
+# @router.get("/all", response_model=List[UserDb], dependencies=[Depends(allowed_get_all_users)])
+# async def read_all_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+#     """
+#     The **read_all_users** function returns a list of users.
+#         ---
+#         get:
+#           summary: Returns all users.
+#           description: This can only be done by the logged in user.
+#           operationId: read_all_users
+#           parameters:
+#             - name: skip (optional)  # The number of records to skip before returning results, default is 0 (no records skipped).  Used for pagination purposes.   See https://docs.mongodb.com/manual/reference/method/cursor.skip/#cursor-skip-examples for more information on how this
+#
+#     :param skip: int: Skip the first n records
+#     :param limit: int: Limit the number of results returned
+#     :param db: Session: Pass the database connection to the function
+#     :return: A list of users
+#     """
+#     users = await repository_users.get_users(skip, limit, db)
+#     return users
+
+# @router.get("/commented_images_by_me/", response_model=List[ImageResponse])
+# async def read_commented_images_by_me(db: Session = Depends(get_db),
+#                                      current_user: User = Depends(auth_service.get_current_user)):
+#     """
+#     The **read_commented_images_by_me** function returns all images that the current user has commented on.
+#
+#     :param db: Session: Get the database session
+#     :param current_user: User: Get the user that is currently logged in
+#     :return: A list of images that the user has commented on
+#     """
+#     images = await repository_users.get_all_commented_images(current_user, db)
+#     if not images:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
+#     return images
+
+# @router.get("/rated_images_by_me/", response_model=List[ImageResponse])
+# async def read_liked_images_by_me(db: Session = Depends(get_db),
+#                                  current_user: User = Depends(auth_service.get_current_user)):
+#     """
+#     The **read_liked_images_by_me** function returns all images liked by the current user.
+#         The function is called when a GET request is made to the /users/me/liked_images endpoint.
+#
+#     :param db: Session: Pass the database connection to the function
+#     :param current_user: User: Get the user object of the current logged in user
+#     :return: A list of images that the user liked
+#     """
+#     images = await repository_users.get_all_liked_images(current_user, db)
+#     if not images:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=NOT_FOUND)
+#     return images
