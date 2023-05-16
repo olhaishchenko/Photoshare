@@ -1,14 +1,8 @@
-.idea/inspectionProfiles/profiles_settings.xml
-
-.idea/misc.xml
-.idea/vcs.xml
-.idea/workspace.xml
+.idea
 
 poetry.lock
 
-
-.idea/Photoshare.iml
 __pycache__
-*.pyc
+.pyc
 
-*.pyc
+.env
