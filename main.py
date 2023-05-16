@@ -7,6 +7,7 @@ import redis.asyncio as redis
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.config.config import settings
+from src.routes import comments
 from src.routes import auth, users
 from src.database.db import get_db
 from src.routes import users
@@ -70,3 +71,4 @@ def healthchecker(db: Session = Depends(get_db)):
 
 app.include_router(auth.router, prefix='/api')
 app.include_router(users.user_router, prefix='/api')
+app.include_router(comments.router, prefix='/api')
