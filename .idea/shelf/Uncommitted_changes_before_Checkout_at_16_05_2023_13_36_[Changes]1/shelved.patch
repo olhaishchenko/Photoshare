@@ -1,0 +1,17 @@
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>.idea/inspectionProfiles/profiles_settings.xml\r\n\r\n.idea/misc.xml\r\n.idea/vcs.xml\r\n.idea/workspace.xml\r\n\r\npoetry.lock\r\n\r\n\r\n.idea/Photoshare.iml\r\n__pycache__\r\n*.pyc\r\n\r\n*.pyc\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore	(revision 6ffcd9fea8d8ac51c27c4fd553e9deea8c82681e)
++++ b/.gitignore	(date 1684233372270)
+@@ -11,4 +11,6 @@
+ __pycache__
+ *.pyc
+ 
++src/__pycache__/schemas.cpython-311.pyc
++src/config/__pycache__/config.cpython-311.pyc
+ *.pyc

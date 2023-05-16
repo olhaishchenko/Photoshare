@@ -22,9 +22,12 @@ tags_images = Table('tags_images', Base.metadata,
 
 class Image(Base):
     __tablename__ = "images"
-    id = Column(Integer, primary_key=True, index=True)
-    description = Column(String, nullable=False)
-    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
+    id = Column(Integer, primary_key=True)
+    image_url = Column(String(255), unique=True, nullable=False)
+    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'))
+    created_at = Column('created_at', DateTime, default=func.now())
+    updated_at = Column('updated_at', DateTime, default=func.now())
+    description = Column(String(255))
     user = relationship('User', backref="images")
 
 class Tag(Base):
