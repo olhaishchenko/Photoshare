@@ -1,13 +1,23 @@
+from typing import List
 
 from libgravatar import Gravatar
-
-
-
 from sqlalchemy.orm import Session
 
 from src.database.models import User, Image, Role
 from src.schemas import UserModel, UpdateUser
 
+
+async def get_me(user: User, db: Session) -> User:
+    """
+    The **get_me** function returns the user object of the current logged in user.
+
+
+    :param user: User: Get the user id
+    :param db: Session: Access the database
+    :return: A user object
+    """
+    user = db.query(User).filter(User.id == user.id).first()
+    return user
 
 
 async def get_user_by_email(email: str, db: Session) -> User | None:
@@ -165,3 +175,62 @@ async def ban_user(id_, db: Session):
             "avatar": user.avatar,
             "created_at": user.created_at}
 
+
+async def make_user_role(email: str, role: Role, db: Session) -> None:
+
+    """
+    The **make_user_role** function takes in an email and a role, and then updates the user's role to that new one.
+    Args:
+    email (str): The user's email address.
+    role (Role): The new Role for the user.
+
+    :param email: str: Get the user by email
+    :param roles: Role: Set the role of the user
+    :param db: Session: Pass the database session to the function
+    :return: None
+    """
+    user = await get_user_by_email(email, db)
+    user.roles = role
+    db.commit()
+
+
+async def get_users(skip: int, limit: int, db: Session) -> List[User]:
+    """
+    The **get_users** function returns a list of users from the database.
+
+    :param skip: int: Skip the first n records in the database
+    :param limit: int: Limit the number of results returned
+    :param db: Session: Pass the database session to the function
+    :return: A list of users
+    """
+    return db.query(User).offset(skip).limit(limit).all()
+
+
+async def get_all_liked_images(user: User, db: Session):
+    """
+    The **get_all_liked_images** function returns all images that a user has liked.
+        Args:
+            user (User): The User object to get the liked images for.
+            db (Session): A database session to use for querying the database.
+        Returns:
+            List[Image]: A list of Image objects that have been liked by the specified User.
+
+    :param user: User: Get the user's id
+    :param db: Session: Pass the database session to the function
+    :return: A list of images that the user liked
+    """
+    pass
+    # TODO: Implement after image part is ready
+    # return db.query(Image).join(Rating).filter(Rating.user_id == user.id).all()
+
+
+async def get_all_commented_images(user: User, db: Session):
+    """
+    The **get_all_commented_images** function returns all posts that a user has commented on.
+
+    :param user: User: Get the user object from the database
+    :param db: Session: Pass the database session to the function
+    :return: All images that have been commented on by a user
+    """
+    # TODO: Implement after image_comment part is ready
+    # return db.query(Image).join(Comment).filter(Comment.user_id == user.id).all()

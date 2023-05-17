@@ -12,7 +12,6 @@ CHECK_CONFIRMATION = "Check your email for confirmation."
 INVALID_TOKEN = 'Invalid scope for token'
 NOT_VALIDATE = 'Could not validate credentials'
 
-
 SUCCESS_CREATE_USER = "Success create user"
 USER_NOT_ACTIVE = "User is not active"
 
@@ -20,6 +19,8 @@ INVALID_TOKEN_EMAIL ="Invalid token for email verification"
 USER_BANNED = "User successfully banned"
 PRIVILEGES_DENIED = "You don have this privileges"
 
+USER_ROLE_EXISTS = 'User role exists'
+USER_CHANGE_ROLE_TO = 'User change role'
 
 COMMENT_NOT_FOUND = "Comment not found or not available."
 OPERATION_FORBIDDEN = "Operation forbidden"
