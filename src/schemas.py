@@ -1,7 +1,7 @@
 from typing import Optional
 from datetime import datetime
 from fastapi import Depends
-from pydantic import BaseModel, Field, EmailStr, validator
+from pydantic import BaseModel, Field, EmailStr, validator, BaseConfig
 from pydantic.types import date
 
 from src.database.models import Role
@@ -90,3 +90,29 @@ class CommentUpdate(CommentModel):
     class Config:
         orm_mode = True
 
+
+class ImageBase(BaseModel):
+    image_url: str = Field(max_length=500)
+    description: Optional[str] = Field(max_length=500)
+
+
+class ImageModel(ImageBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+    user_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class ImageResponse(ImageModel):
+    detail: str = "Image successfully created"
+
+    class Config:
+        orm_mode = True
+
+
+class ImageUpdateModel(BaseModel):
+    id: int
+    transformation: str

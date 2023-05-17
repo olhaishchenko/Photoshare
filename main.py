@@ -3,11 +3,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from fastapi_limiter import FastAPILimiter
 import redis.asyncio as redis
+import uvicorn
 
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.config.config import settings
-from src.routes import auth, users, comments
+from src.routes import auth, users, comments, pictures
 from src.database.db import get_db
 
 app = FastAPI()
@@ -69,3 +70,9 @@ def healthchecker(db: Session = Depends(get_db)):
 app.include_router(auth.router, prefix='/api')
 app.include_router(users.user_router, prefix='/api')
 app.include_router(comments.router, prefix='/api')
+app.include_router(pictures.router, prefix='/api')
+
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8000)
