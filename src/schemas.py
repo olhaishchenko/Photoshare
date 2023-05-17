@@ -84,6 +84,7 @@ class RequestRole(BaseModel):
     email: EmailStr
     roles: Role
 
+
 class CommentBase(BaseModel):
     comment: str = Field(max_length=500)
 

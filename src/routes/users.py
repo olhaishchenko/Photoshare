@@ -8,19 +8,19 @@ from src.database.db import get_db
 from src.database.models import User, Role
 from src.schemas import UserDb, UpdateUser, UserModel, UserResponse, UserInfoResponse, UserBanned, RequestRole
 from src.services.auth import auth_service
-from src.services.roles import RoleAccess
+from src.services.roles import CheckRole
 from src.repository import users as repository_users
 
 user_router = APIRouter(prefix="/user", tags=['users'])
 
 security = HTTPBearer()
 
-# allowed_get_user = RoleAccess([Role.admin, Role.moderator, Role.user])
-# allowed_create_user = RoleAccess([Role.admin, Role.moderator, Role.user])
-allowed_get_all_users = RoleAccess([Role.admin])
-# allowed_remove_user = RoleAccess([Role.admin])
-# allowed_ban_user = RoleAccess([Role.admin])
-allowed_change_user_role = RoleAccess([Role.admin])
+# allowed_get_user = CheckRole([Role.admin, Role.moderator, Role.user])
+# allowed_create_user = CheckRole([Role.admin, Role.moderator, Role.user])
+allowed_get_all_users = CheckRole([Role.admin])
+# allowed_remove_user = CheckRole([Role.admin])
+# allowed_ban_user = CheckRole([Role.admin])
+allowed_change_user_role = CheckRole([Role.admin])
 
 
 @user_router.get("/me/", response_model=UserResponse)
