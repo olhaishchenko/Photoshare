@@ -5,7 +5,7 @@ from typing import List
 
 from src.database.db import get_db
 from src.database.models import User
-from src.schemas import ImageResponse
+from src.schemas import ImageResponse, ImageEditorModel
 from src.services.auth import auth_service
 from src.repository import pictures as repository_pictures
 from src.services.cloud_image import CloudImage
@@ -91,3 +91,23 @@ async def remove_image(image_id: int,
     if image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
     return image
+
+
+@router.post("/image_editor", response_model=ImageResponse, status_code=status.HTTP_201_CREATED)
+async def create_image_editor(body: ImageEditorModel,
+                              current_user: User = Depends(auth_service.get_current_user),
+                              db: Session = Depends(get_db)):
+    '''
+    The **create_image_editor** function creates a new image in the database.
+    It takes a description and an image file as input.
+    The image file is uploaded to Cloudinary and the url is stored in the database.
+
+    :param body: ImageEditorModel: The description of the image
+    :param current_user: User: The user object
+    :param db: Session: A connection to our Postgres SQL database.
+    :return: A image object
+    '''
+    image = await repository_pictures.get_image_from_id(body.image_id, current_user, db)
+    if image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+    edit_image_url = CloudImage.edit_image(image.image_url, body)

@@ -132,3 +132,10 @@ class ImageResponse(ImageModel):
 class ImageUpdateModel(BaseModel):
     id: int
     transformation: str
+
+
+class ImageEditorModel(BaseModel):
+    id: int
+    edit_func: str
+    width: int
+    height: int
