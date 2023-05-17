@@ -185,12 +185,12 @@ async def make_user_role(email: str, role: Role, db: Session) -> None:
     role (Role): The new Role for the user.
 
     :param email: str: Get the user by email
-    :param role: Role: Set the role of the user
+    :param roles: Role: Set the role of the user
     :param db: Session: Pass the database session to the function
     :return: None
     """
     user = await get_user_by_email(email, db)
-    user.role = role
+    user.roles = role
     db.commit()
 
 

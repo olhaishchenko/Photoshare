@@ -137,11 +137,11 @@ async def make_role_by_email(body: RequestRole, db: Session = Depends(get_db)):
     user = await repository_users.get_user_by_email(body.email, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail.INVALID_EMAIL)
-    if body.role == user.role:
+    if body.roles == user.roles:
         return {"message": detail.USER_ROLE_EXISTS}
     else:
-        await repository_users.make_user_role(body.email, body.role, db)
-        return {"message": f"{detail.USER_CHANGE_ROLE_TO} {body.role.value}"}
+        await repository_users.make_user_role(body.email, body.roles, db)
+        return {"message": f"{detail.USER_CHANGE_ROLE_TO} {body.roles.value}"}
 
 # @user_router.get("/commented_images_by_me/", response_model=List[ImageResponse])
 @user_router.get("/commented_images_by_me/")
