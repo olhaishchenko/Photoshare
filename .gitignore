@@ -6,3 +6,6 @@ __pycache__
 .pyc
 
 .env
+
+.DS_Store
+src/.DS_Store

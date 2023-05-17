@@ -20,3 +20,7 @@ INVALID_TOKEN_EMAIL ="Invalid token for email verification"
 USER_BANNED = "User successfully banned"
 PRIVILEGES_DENIED = "You don have this privileges"
 
+
+COMMENT_NOT_FOUND = "Comment not found or not available."
+OPERATION_FORBIDDEN = "Operation forbidden"
+
