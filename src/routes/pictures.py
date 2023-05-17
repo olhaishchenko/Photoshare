@@ -1,7 +1,5 @@
 from fastapi import Depends, status, APIRouter, UploadFile, File, Query
 from sqlalchemy.orm import Session
-import cloudinary
-import cloudinary.uploader
 from fastapi import HTTPException
 from typing import List
 
@@ -9,8 +7,8 @@ from src.database.db import get_db
 from src.database.models import User
 from src.schemas import ImageResponse
 from src.services.auth import auth_service
-from src.config.config import settings
 from src.repository import pictures as repository_pictures
+from src.services.cloud_image import CloudImage
 
 
 
@@ -33,18 +31,11 @@ async def create_image(description: str,
     :param db: Session: A connection to our Postgres SQL database.
     :return: A image object
     '''
-    cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
-    r = cloudinary.uploader.upload(image_file.file)
-    image_url = r['secure_url']
-    new_image = await repository_pictures.create(description, image_url, current_user, db)
-    if new_image is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Image not created")
-    return new_image
+    file_name = CloudImage.generate_name_image()
+    CloudImage.upload(image_file.file, file_name, overwrite=False)
+    image_url = CloudImage.get_url_for_image(file_name)
+    image = await repository_pictures.create(description, image_url, current_user, db)
+    return image
 
 
 @router.get("/", response_model=List[ImageResponse], status_code=status.HTTP_200_OK)
