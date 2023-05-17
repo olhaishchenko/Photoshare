@@ -79,6 +79,10 @@ class UserInfoResponse(BaseModel):
     images_count: int
 
 
+class RequestRole(BaseModel):
+    email: str
+    role: str
+
 class CommentBase(BaseModel):
     comment: str = Field(max_length=500)
 
