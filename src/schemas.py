@@ -1,5 +1,5 @@
 from typing import Optional
-
+from datetime import datetime
 from fastapi import Depends
 from pydantic import BaseModel, Field, EmailStr, validator
 from pydantic.types import date
@@ -67,4 +67,26 @@ class UserInfoResponse(BaseModel):
     username: str
     created_at: date
     images_count: int
+
+
+class CommentBase(BaseModel):
+    comment: str = Field(max_length=500)
+
+
+class CommentModel(CommentBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+    user_id: int
+    image_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class CommentUpdate(CommentModel):
+    updated_at = datetime
+
+    class Config:
+        orm_mode = True
 
