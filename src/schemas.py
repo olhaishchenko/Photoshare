@@ -13,7 +13,6 @@ class UserModel(BaseModel):
     password: str = Field(min_length=6, max_length=20)
 
 
-
 class UserDb(BaseModel):
     id: int
     username: str
@@ -25,10 +24,12 @@ class UserDb(BaseModel):
         orm_mode = True
 
 
-
-
 class UserResponse(BaseModel):
-    user: UserDb
+    id: int
+    username: str
+    email: EmailStr
+    avatar: str
+    created_at: date
     detail: str = "User successfully created"
 
     class Config:
@@ -54,6 +55,7 @@ class TokenModel(BaseModel):
 class RequestEmail(BaseModel):
     email: EmailStr
 
+
 class UpdateUser(BaseModel):
     username: Optional[str]
     email: Optional[EmailStr] = None
@@ -65,7 +67,6 @@ class UpdateUser(BaseModel):
     @validator('username', pre=True, always=True)
     def remove_empty_username(cls, v):
         return v if v is not None and v != "" else None
-
 
 
 class UserBanned(BaseModel):
@@ -80,8 +81,8 @@ class UserInfoResponse(BaseModel):
 
 
 class RequestRole(BaseModel):
-    email: str
-    role: str
+    email: EmailStr
+    roles: Role
 
 class CommentBase(BaseModel):
     comment: str = Field(max_length=500)

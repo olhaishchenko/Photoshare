@@ -7,6 +7,18 @@ from src.database.models import User, Image, Role
 from src.schemas import UserModel, UpdateUser
 
 
+async def get_me(user: User, db: Session) -> User:
+    """
+    The **get_me** function returns the user object of the current logged in user.
+
+
+    :param user: User: Get the user id
+    :param db: Session: Access the database
+    :return: A user object
+    """
+    user = db.query(User).filter(User.id == user.id).first()
+    return user
+
 
 async def get_user_by_email(email: str, db: Session) -> User | None:
     """

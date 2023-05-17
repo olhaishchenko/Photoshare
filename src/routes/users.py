@@ -24,7 +24,7 @@ allowed_change_user_role = RoleAccess([Role.admin])
 
 
 @user_router.get("/me/", response_model=UserResponse)
-async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
+async def read_users_me(current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     """
     The **read_users_me** function is a GET endpoint that returns the current user's information.
     It uses the auth_service to get the current user, and then returns it.
@@ -32,7 +32,8 @@ async def read_users_me(current_user: User = Depends(auth_service.get_current_us
     :param current_user: User: Get the current user
     :return: The current user object
     """
-    return current_user
+    user = await repository_users.get_me(current_user, db)
+    return user
 
 # @user_router.post('/create_test', response_model=UserResponse)
 # async def create_one_user(body: UserModel, db: Session = Depends(get_db)):
@@ -76,7 +77,6 @@ async def user_info(db: Session = Depends(get_db),
     :return: user info
     :rtype: dict
     """
-
     user_info = await repository_users.get_user_info(current_user, db)
     return user_info
 
@@ -98,6 +98,7 @@ async def ban_user(id_, db: Session = Depends(get_db), current_user: User = Depe
         raise HTTPException(status_code=403, detail=detail.PRIVILEGES_DENIED)
     banned_user = await repository_users.ban_user(id_, db)
     return {"user": banned_user, "detail": detail.USER_BANNED}
+
 
 @user_router.get("/all", response_model=List[UserDb], dependencies=[Depends(allowed_get_all_users)])
 async def read_all_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
