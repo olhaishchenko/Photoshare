@@ -112,3 +112,23 @@ async def image_editor(image_id: int,
     if image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
     return image
+
+
+@router.patch("/description/{image_id}", response_model=ImageResponse)
+async def edit_description(image_id: int,
+                            description: str,
+                            current_user: User = Depends(auth_service.get_current_user),
+                            db: Session = Depends(get_db)):
+     '''
+     The **edit_description** function edits the description of a single image from the database.
+    
+     :param image_id: int: The id of the image to edit
+     :param description: str: The description of the image
+     :param current_user: User: The user object
+     :param db: Session: A connection to our Postgres SQL database.
+     :return: A image object
+     '''
+     image = await repository_pictures.edit_description(image_id, description, current_user, db)
+     if image is None:
+          raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+     return image

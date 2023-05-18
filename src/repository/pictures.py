@@ -152,3 +152,23 @@ async def image_editor(image_id: int,
             db.refresh(image)
             return image
 
+
+async def edit_description(image_id: int, 
+                           description: str,
+                           user: User,
+                           db: Session):
+    '''
+    The **edit_description** function edits a single image from the database.
+    
+    :param image_id: int: The id of the image to edit
+    :param body: EditDescriptionModel: The body of the request
+    :param user: User: The user object
+    :param db: Session: A connection to our Postgres SQL database.
+    :return: A image object
+    '''
+    image = await get_image_from_id(image_id, user, db)
+    if image:
+        image.description = description
+        db.commit()
+        db.refresh(image)
+        return image
