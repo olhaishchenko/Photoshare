@@ -54,19 +54,6 @@ class Comment(Base):
     image = relationship('Image', backref="comments")
 
 
-
-# class Comment(Base):
-#     __tablename__ = "comments"
-#     id = Column(Integer, primary_key=True, index=True)
-#     comment = Column(String, nullable=False)
-#     created_at = Column(DateTime, default=func.now())
-#     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-#     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-#     user = relationship('User', backref="comments")
-#     image_id = Column(Integer, ForeignKey("images.id"), nullable=True)
-#     image = relationship('Image', backref="comments")
-
-
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -79,6 +66,13 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
     confirmed = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
+
+
+class BlacklistToken(Base):
+    __tablename__ = 'blacklist_tokens'
+    id = Column(Integer, primary_key=True)
+    token = Column(String(500), unique=True, nullable=False)
+    blacklisted_on = Column(DateTime, default=func.now())
 
 
 
