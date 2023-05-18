@@ -127,15 +127,3 @@ class ImageResponse(ImageModel):
 
     class Config:
         orm_mode = True
-
-
-class ImageUpdateModel(BaseModel):
-    id: int
-    transformation: str
-
-
-class ImageEditorModel(BaseModel):
-    id: int
-    edit_func: str
-    width: int
-    height: int
