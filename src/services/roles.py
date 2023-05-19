@@ -15,7 +15,7 @@ class CheckRole:
         print(request.method, request.url)
         print(f'User role {current_user.roles}')
         print(f'Allowed roles: {self.allowed_roles}')
-        if current_user.role not in self.allowed_roles:
+        if current_user.roles not in self.allowed_roles:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=detail.OPERATION_FORBIDDEN)
 
 

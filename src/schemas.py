@@ -25,25 +25,21 @@ class UserDb(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: int
-    username: str
-    email: EmailStr
-    avatar: str
-    created_at: date
+    user: UserDb
     detail: str = "User successfully created"
 
     class Config:
         orm_mode = True
 
-# class UserModelProfile(BaseModel):
+
+# class UserProfileResponse(BaseModel):
+#     id: int
 #     username: str
 #     email: str
 #     avatar: str
 #     is_active: bool
 #     created_at: datetime
-#     post_count: int
-#     comment_count: int
-#     rates_count: int
+
 
 
 class TokenModel(BaseModel):

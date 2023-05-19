@@ -66,13 +66,3 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
     confirmed = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
-
-
-class BlacklistToken(Base):
-    __tablename__ = 'blacklist_tokens'
-    id = Column(Integer, primary_key=True)
-    token = Column(String(500), unique=True, nullable=False)
-    blacklisted_on = Column(DateTime, default=func.now())
-
-
-

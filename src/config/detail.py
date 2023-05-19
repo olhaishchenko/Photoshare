@@ -25,3 +25,7 @@ USER_CHANGE_ROLE_TO = 'User change role'
 COMMENT_NOT_FOUND = "Comment not found or not available."
 OPERATION_FORBIDDEN = "Operation forbidden"
 
+USER_IS_LOGOUT = "User is logout"
+USER_REMOVE = 'User removed'
+User_REMOVE_FROM_BLACKLIST = "User remove from blacklist"
+

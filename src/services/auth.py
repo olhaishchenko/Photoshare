@@ -7,7 +7,7 @@
 5. Отримання поточного юзера
 6. Отримання email з токена підтвердження
 """
-
+import uuid
 from datetime import datetime, timedelta
 from typing import Optional
 import pickle
@@ -31,7 +31,26 @@ class Auth:
     SECRET_KEY = settings.secret_key
     ALGORITHM = settings.algorithm
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=detail.NOT_VALIDATE,
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     r = redis.Redis(host=settings.redis_host, port=settings.redis_port, db=0)
+
+    async def blocklist(self, token):
+        payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+        if payload.get("scope") == "access_token":
+            email = payload.get("sub")
+            if email is None:
+                raise self.credentials_exception
+            jti = payload.get("jti")
+            if jti is None:
+                raise self.credentials_exception
+        self.r.set(jti, 'true')
+
+    def is_blocklisted(self, jti):
+        return self.r.exists(jti)
 
     def get_password_hash(self, password: str):
         """
@@ -70,7 +89,9 @@ class Auth:
             expire = datetime.utcnow() + timedelta(seconds=expires_delta)
         else:
             expire = datetime.utcnow() + timedelta(minutes=15)
-        to_encode.update({"iat": datetime.utcnow(), "exp": expire, "scope": "access_token"})
+        payload = {"iat": datetime.utcnow(), "exp": expire, "scope": "access_token"}
+        payload['jti'] = str(uuid.uuid4())
+        to_encode.update(payload)
         encoded_access_token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
         return encoded_access_token
 
@@ -94,6 +115,25 @@ class Auth:
         encoded_refresh_token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
         return encoded_refresh_token
 
+    def required_auth_with_email(self, token: str = Depends(oauth2_scheme)):
+        try:
+            # Decode JWT
+            payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+            if payload.get("scope") == "access_token":
+                email = payload.get("sub")
+                if email is None:
+                    raise self.credentials_exception
+                jti = payload.get("jti")
+                if jti is None:
+                    raise self.credentials_exception
+                if self.is_blocklisted(jti):
+                    raise self.credentials_exception
+                return email
+            else:
+                raise self.credentials_exception
+        except JWTError as e:
+            raise self.credentials_exception
+
     async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
         """
         Function is a dependency that will be used in the UserRouter class.
@@ -104,36 +144,20 @@ class Auth:
         :db: Session: Get the database session
         :return: The user that is currently logged in
         """
-        credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=detail.NOT_VALIDATE,
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-        try:
-            # Decode JWT
-            payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-            if payload.get("scope") == "access_token":
-                email = payload.get("sub")
-                if email is None:
-                    raise credentials_exception
-            else:
-                raise credentials_exception
-        except JWTError as e:
-            raise credentials_exception
+        email = self.required_auth_with_email(token)
 
         user = self.r.get(f"user:{email}")
         if user is None:
             user = await repository_users.get_user_by_email(email, db)
             if user is None:
-                raise credentials_exception
+                raise self.credentials_exception
             self.r.set(f"user:{email}", pickle.dumps(user))
             self.r.expire(f"user:{email}", 900)
         else:
             user = pickle.loads(user)
 
         if user is None:
-            raise credentials_exception
+            raise self.credentials_exception
         return user
 
     async def decode_refresh_token(self, refresh_token: str):

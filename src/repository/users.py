@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import List
 
 from libgravatar import Gravatar
 from sqlalchemy.orm import Session
 
-from src.database.models import User, Image, Role
+from src.database.models import User, Image, Role, Comment
 from src.schemas import UserModel, UpdateUser
 
 
@@ -99,6 +100,7 @@ async def update_avatar(email, url: str, db: Session) -> User:
     db.commit()
     return user
 
+
 async def update_user_info(email, body: UpdateUser, db: Session):
     """
     Change user name or email. Empty fields stay the same.
@@ -119,7 +121,7 @@ async def update_user_info(email, body: UpdateUser, db: Session):
 
     return user
 
-#
+
 # async def create_one_user(body: UserModel, db: Session):
 #     new_user = User(**body.dict())
 #     db.add(new_user)
@@ -185,7 +187,7 @@ async def make_user_role(email: str, role: Role, db: Session) -> None:
     role (Role): The new Role for the user.
 
     :param email: str: Get the user by email
-    :param roles: Role: Set the role of the user
+    :param role: Role: Set the role of the user
     :param db: Session: Pass the database session to the function
     :return: None
     """
@@ -232,5 +234,17 @@ async def get_all_commented_images(user: User, db: Session):
     :param db: Session: Pass the database session to the function
     :return: All images that have been commented on by a user
     """
-    # TODO: Implement after image_comment part is ready
-    # return db.query(Image).join(Comment).filter(Comment.user_id == user.id).all()
+    return db.query(Image).join(Comment).filter(Comment.user_id == user.id).all()
+
+
+async def remove_from_users(id_: int, db: Session) -> None:
+    """
+    The **remove_from_blacklist** function removes a user
+
+    :param id_: int: id of user to remove
+    :param db: Session: Access the database
+    :return: None
+    """
+    user = db.query(User).filter(User.id == id_).first()
+    db.delete(user)
+    db.commit()

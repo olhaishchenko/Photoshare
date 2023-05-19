@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from fastapi_limiter import FastAPILimiter
@@ -73,6 +73,5 @@ app.include_router(comments.router, prefix='/api')
 app.include_router(pictures.router, prefix='/api')
 
 
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="localhost", port=8000)
