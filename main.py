@@ -73,5 +73,5 @@ app.include_router(comments.router, prefix='/api')
 app.include_router(pictures.router, prefix='/api')
 
 
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="localhost", port=8000)
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8000)
