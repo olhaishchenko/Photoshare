@@ -1,12 +1,12 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPBearer
+from fastapi import APIRouter, Depends, HTTPException, status, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from src.config import detail
 from src.database.db import get_db
 from src.database.models import User, Role
-from src.schemas import UserDb, UpdateUser, UserModel, UserResponse, UserInfoResponse, UserBanned, RequestRole
+from src.schemas import UserDb, UpdateUser, UserInfoResponse, UserBanned, RequestRole, ImageResponse
 from src.services.auth import auth_service
 from src.services.roles import CheckRole
 from src.repository import users as repository_users
@@ -15,15 +15,14 @@ user_router = APIRouter(prefix="/user", tags=['users'])
 
 security = HTTPBearer()
 
-# allowed_get_user = CheckRole([Role.admin, Role.moderator, Role.user])
-# allowed_create_user = CheckRole([Role.admin, Role.moderator, Role.user])
+allowed_all_user = CheckRole([Role.admin, Role.moderator, Role.user])
 allowed_get_all_users = CheckRole([Role.admin])
-# allowed_remove_user = CheckRole([Role.admin])
-# allowed_ban_user = CheckRole([Role.admin])
+allowed_remove_user = CheckRole([Role.admin, Role.moderator])
+allowed_ban_user = CheckRole([Role.admin])
 allowed_change_user_role = CheckRole([Role.admin])
 
 
-@user_router.get("/me/", response_model=UserResponse)
+@user_router.get("/me/", response_model=UserDb, dependencies=[Depends(allowed_all_user)])
 async def read_users_me(current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     """
     The **read_users_me** function is a GET endpoint that returns the current user's information.
@@ -35,16 +34,8 @@ async def read_users_me(current_user: User = Depends(auth_service.get_current_us
     user = await repository_users.get_me(current_user, db)
     return user
 
-# @user_router.post('/create_test', response_model=UserResponse)
-# async def create_one_user(body: UserModel, db: Session = Depends(get_db)):
-#     exist_user = await repository_users.get_user_by_email(body.email, db)
-#     if exist_user:
-#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
-#     new_user = await repository_users.create_one_user(body, db)
-#     return {"user": new_user, "detail": "User successfully created"}
 
-
-@user_router.put('/edit', response_model=UserDb)
+@user_router.put('/edit', response_model=UserDb, dependencies=[Depends(allowed_all_user)])
 async def update_user_info(body: UpdateUser, current_user: User = Depends(auth_service.get_current_user),
                            db: Session = Depends(get_db)):
     """
@@ -64,7 +55,23 @@ async def update_user_info(body: UpdateUser, current_user: User = Depends(auth_s
     return user
 
 
-@user_router.get('/info', response_model=UserInfoResponse)
+@user_router.put('/remove', dependencies=[Depends(allowed_remove_user)])
+async def user_remove(id_, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
+    """
+    Ban user
+
+    :param current_user: user whose info is changing
+    :type current_user: User
+    :param db: The database session
+    :type db: Session
+    :return: banned user info with message of success
+    :rtype: dict
+    """
+    await repository_users.remove_from_users(id_, db)
+    return {"user_id": id_, "detail": detail.USER_REMOVE}
+
+
+@user_router.get('/info', response_model=UserInfoResponse, dependencies=[Depends(allowed_all_user)])
 async def user_info(db: Session = Depends(get_db),
                     current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -81,7 +88,7 @@ async def user_info(db: Session = Depends(get_db),
     return user_info
 
 
-@user_router.put('/ban/{id_}', response_model=UserBanned)
+@user_router.put('/ban/{id_}', response_model=UserBanned, dependencies=[Depends(allowed_ban_user)])
 async def ban_user(id_, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
     """
     Ban user
@@ -124,7 +131,7 @@ async def read_all_users(skip: int = 0, limit: int = 10, db: Session = Depends(g
 @user_router.patch("/make_role/{email}/", dependencies=[Depends(allowed_change_user_role)])
 async def make_role_by_email(body: RequestRole, db: Session = Depends(get_db)):
     """
-    The make_role_by_email function is used to change the role of a user.
+    The **make_role_by_email** function is used to change the role of a user.
         The function takes in an email and a role, and changes the user's role to that specified by the inputted
         parameters. If no such user exists, then an HTTPException is raised with status code 401 (Unauthorized)
         and detail message &quot;Invalid Email&quot;. If the new role matches that of the current one, then a message saying so
@@ -143,8 +150,8 @@ async def make_role_by_email(body: RequestRole, db: Session = Depends(get_db)):
         await repository_users.make_user_role(body.email, body.roles, db)
         return {"message": f"{detail.USER_CHANGE_ROLE_TO} {body.roles.value}"}
 
-# @user_router.get("/commented_images_by_me/", response_model=List[ImageResponse])
-@user_router.get("/commented_images_by_me/")
+
+@user_router.get("/commented_images_by_me/", response_model=List[ImageResponse])
 async def read_commented_images_by_me(db: Session = Depends(get_db),
                                      current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -159,8 +166,8 @@ async def read_commented_images_by_me(db: Session = Depends(get_db),
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail.NOT_FOUND)
     return images
 
-# @user_router.get("/rated_images_by_me/", response_model=List[ImageResponse])
-@user_router.get("/rated_images_by_me/")
+
+@user_router.get("/rated_images_by_me/", response_model=List[ImageResponse])
 async def read_liked_images_by_me(db: Session = Depends(get_db),
                                  current_user: User = Depends(auth_service.get_current_user)):
     """

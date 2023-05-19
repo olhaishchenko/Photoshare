@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from src.config import detail
 from src.database.db import get_db
+from src.database.models import User
 from src.schemas import UserModel, UserResponse, TokenModel, RequestEmail
 from src.repository import users as repository_users
 from src.services.auth import auth_service
@@ -16,7 +17,7 @@ security = HTTPBearer()
 
 
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED,
-             dependencies=[Depends(RateLimiter(times=2, seconds=300))])
+             dependencies=[Depends(RateLimiter(times=5, seconds=300))])
 async def signup(body: UserModel, background_tasks: BackgroundTasks, request: Request, db: Session = Depends(get_db)):
     """
     The **signup** function creates a new user in the database.
@@ -35,7 +36,7 @@ async def signup(body: UserModel, background_tasks: BackgroundTasks, request: Re
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail.ACCOUNT_AlREADY_EXISTS)
     body.password = auth_service.get_password_hash(body.password)
     new_user = await repository_users.create_user(body, db)
-    # background_tasks.add_task(send_email, new_user.email, new_user.username, str(request.base_url))
+    background_tasks.add_task(send_email, new_user.email, new_user.username, str(request.base_url))
     return {"user": new_user, "detail": detail.SUCCESS_CREATE_USER}
 
 
@@ -53,8 +54,8 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     user = await repository_users.get_user_by_email(body.username, db)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail.INVALID_EMAIL)
-    # if not user.confirmed:
-    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail.EMAIL_NOT_CONFIRMED)
+    if not user.confirmed:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail.EMAIL_NOT_CONFIRMED)
     # Check is_active
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=detail.USER_NOT_ACTIVE)
@@ -66,6 +67,14 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     refresh_token = await auth_service.create_refresh_token(data={"sub": user.email})
     await repository_users.update_token(user, refresh_token, db)
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+
+
+@router.post("/logout")
+async def logout(credentials: HTTPAuthorizationCredentials = Security(security),
+                 db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
+    token = credentials.credentials
+    await auth_service.blocklist(token)
+    return {"message": detail.USER_IS_LOGOUT}
 
 
 @router.get('/refresh_token', response_model=TokenModel)
