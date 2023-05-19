@@ -47,7 +47,7 @@ class Auth:
             jti = payload.get("jti")
             if jti is None:
                 raise self.credentials_exception
-        self.r.set(jti, 'true')
+            self.r.set(jti, 'true')
 
     def is_blocklisted(self, jti):
         return self.r.exists(jti)
