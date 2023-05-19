@@ -93,7 +93,6 @@ async def ban_user(id_, db: Session = Depends(get_db), current_user: User = Depe
     :return: banned user info with message of success
     :rtype: dict
     """
-    print('current user role', str(current_user.roles))
     if str(current_user.roles) != "Role.admin":
         raise HTTPException(status_code=403, detail=PRIVILEGES_DENIED)
     banned_user = await repository_users.ban_user(id_, db)

@@ -54,7 +54,7 @@ async def delete_comment(comment_id: int, db: Session, user: User) -> None:
     """
     comment = db.query(Comment).filter(Comment.id == comment_id).first()
     if comment:
-        if user.roles in [Role.admin, Role.moderator]:
+        if user.role in [Role.admin, Role.moderator]:
             db.delete(comment)
             db.commit()
     return comment
