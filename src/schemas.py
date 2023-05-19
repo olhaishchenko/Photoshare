@@ -13,7 +13,6 @@ class UserModel(BaseModel):
     password: str = Field(min_length=6, max_length=20)
 
 
-
 class UserDb(BaseModel):
     id: int
     username: str
@@ -25,14 +24,22 @@ class UserDb(BaseModel):
         orm_mode = True
 
 
-
-
 class UserResponse(BaseModel):
     user: UserDb
     detail: str = "User successfully created"
 
     class Config:
         orm_mode = True
+
+
+# class UserProfileResponse(BaseModel):
+#     id: int
+#     username: str
+#     email: str
+#     avatar: str
+#     is_active: bool
+#     created_at: datetime
+
 
 
 class TokenModel(BaseModel):
@@ -43,6 +50,7 @@ class TokenModel(BaseModel):
 
 class RequestEmail(BaseModel):
     email: EmailStr
+
 
 class UpdateUser(BaseModel):
     username: Optional[str]
@@ -57,7 +65,6 @@ class UpdateUser(BaseModel):
         return v if v is not None and v != "" else None
 
 
-
 class UserBanned(BaseModel):
     user: UserDb
     detail: str = "User successfully banned"
@@ -67,6 +74,11 @@ class UserInfoResponse(BaseModel):
     username: str
     created_at: date
     images_count: int
+
+
+class RequestRole(BaseModel):
+    email: EmailStr
+    roles: Role
 
 
 class CommentBase(BaseModel):
