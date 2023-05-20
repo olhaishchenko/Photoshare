@@ -23,6 +23,7 @@ python-multipart = "^0.0.6"
 aioredis = "^2.0.1"
 sqlalchemy = "^2.0.13"
 cloudinary = "^1.33.0"
+uuid = "^1.30"
 
 
 

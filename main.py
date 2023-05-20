@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from fastapi_limiter import FastAPILimiter
@@ -71,7 +71,6 @@ app.include_router(auth.router, prefix='/api')
 app.include_router(users.user_router, prefix='/api')
 app.include_router(comments.router, prefix='/api')
 app.include_router(pictures.router, prefix='/api')
-
 
 
 if __name__ == "__main__":
