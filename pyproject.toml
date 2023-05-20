@@ -8,12 +8,24 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.95.1"
-pydantic = {extras = ["email"], version = "^1.10.7"}
+pydantic = {extras = ["dotenv"], version = "^1.10.7"}
 psycopg2 = "^2.9.6"
 alembic = "^1.10.4"
 uvicorn = {extras = ["standard"], version = "^0.22.0"}
 redis = "^4.5.5"
 fastapi-limiter = "^0.1.5"
+
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+libgravatar = "^1.0.4"
+fastapi-mail = "^1.2.8"
+python-multipart = "^0.0.6"
+aioredis = "^2.0.1"
+sqlalchemy = "^2.0.13"
+cloudinary = "^1.33.0"
+uuid = "^1.30"
+
+
 
 
 [build-system]
