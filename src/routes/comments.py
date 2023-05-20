@@ -14,7 +14,7 @@ router = APIRouter(prefix='/comments', tags=["comments"])
 
 allowed_get_comments = CheckRole([Role.admin, Role.moderator, Role.user])
 allowed_add_comments = CheckRole([Role.admin, Role.moderator, Role.user])
-allowed_edit_comments = CheckRole([Role.admin, Role.moderator])
+allowed_edit_comments = CheckRole([Role.admin, Role.moderator, Role.user])
 allowed_delete_comments = CheckRole([Role.admin, Role.moderator])
 
 

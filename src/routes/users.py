@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from src.config import detail
 from src.database.db import get_db
 from src.database.models import User, Role
-from src.schemas import UserDb, UpdateUser, UserInfoResponse, UserBanned, RequestRole, ImageResponse
+from src.schemas import UserDb, UpdateUser, UserInfoResponse, UserBanned, RequestRole, ImageModel
 from src.services.auth import auth_service
 from src.services.roles import CheckRole
 from src.repository import users as repository_users
@@ -151,7 +151,7 @@ async def make_role_by_email(body: RequestRole, db: Session = Depends(get_db)):
         return {"message": f"{detail.USER_CHANGE_ROLE_TO} {body.roles.value}"}
 
 
-@user_router.get("/commented_images_by_me/", response_model=List[ImageResponse])
+@user_router.get("/commented_images_by_me/", response_model=List[ImageModel])
 async def read_commented_images_by_me(db: Session = Depends(get_db),
                                      current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -167,7 +167,7 @@ async def read_commented_images_by_me(db: Session = Depends(get_db),
     return images
 
 
-@user_router.get("/rated_images_by_me/", response_model=List[ImageResponse])
+@user_router.get("/rated_images_by_me/", response_model=List[ImageModel])
 async def read_liked_images_by_me(db: Session = Depends(get_db),
                                  current_user: User = Depends(auth_service.get_current_user)):
     """
