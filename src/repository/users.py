@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List
 
 from libgravatar import Gravatar
@@ -168,14 +167,16 @@ async def ban_user(id_, db: Session):
 
     """
     user = db.query(User).filter(User.id == id_).first()
-    user.is_active = False
-    db.commit()
-
-    return {"id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "avatar": user.avatar,
-            "created_at": user.created_at}
+    if user:
+        user.is_active = False
+        db.commit()
+        return {"id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "avatar": user.avatar,
+                "created_at": user.created_at}
+    else:
+        return None
 
 
 async def make_user_role(email: str, role: Role, db: Session) -> None:
@@ -208,22 +209,22 @@ async def get_users(skip: int, limit: int, db: Session) -> List[User]:
     return db.query(User).offset(skip).limit(limit).all()
 
 
-async def get_all_liked_images(user: User, db: Session):
-    """
-    The **get_all_liked_images** function returns all images that a user has liked.
-        Args:
-            user (User): The User object to get the liked images for.
-            db (Session): A database session to use for querying the database.
-        Returns:
-            List[Image]: A list of Image objects that have been liked by the specified User.
-
-    :param user: User: Get the user's id
-    :param db: Session: Pass the database session to the function
-    :return: A list of images that the user liked
-    """
-    pass
-    # TODO: Implement after image part is ready
-    # return db.query(Image).join(Rating).filter(Rating.user_id == user.id).all()
+# async def get_all_liked_images(user: User, db: Session):
+#     """
+#     The **get_all_liked_images** function returns all images that a user has liked.
+#         Args:
+#             user (User): The User object to get the liked images for.
+#             db (Session): A database session to use for querying the database.
+#         Returns:
+#             List[Image]: A list of Image objects that have been liked by the specified User.
+#
+#     :param user: User: Get the user's id
+#     :param db: Session: Pass the database session to the function
+#     :return: A list of images that the user liked
+#     """
+#     pass
+#     # TODO: Implement after image part is ready
+#     # return db.query(Image).join(Rating).filter(Rating.user_id == user.id).all()
 
 
 async def get_all_commented_images(user: User, db: Session):
@@ -246,5 +247,10 @@ async def remove_from_users(id_: int, db: Session) -> None:
     :return: None
     """
     user = db.query(User).filter(User.id == id_).first()
-    db.delete(user)
-    db.commit()
+    print(user)
+    if user:
+        db.delete(user)
+        db.commit()
+    return user
+
+

@@ -93,7 +93,7 @@ class TestUsersRepos(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, users)
 
     async def test_remove_from_users(self):
-        user = self.user
+        user = [User(id=1), User(), User()]
         self.session.query().filter().first.return_value = user
         result = await remove_from_users(1, self.session)
         self.assertEqual(result, user)
