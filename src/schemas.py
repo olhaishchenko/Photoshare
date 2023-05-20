@@ -123,8 +123,3 @@ class ImageResponse(ImageModel):
 
     class Config:
         orm_mode = True
-
-
-class ImageUpdateModel(BaseModel):
-    id: int
-    transformation: str

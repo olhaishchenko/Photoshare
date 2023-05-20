@@ -1,16 +1,15 @@
 from fastapi import Depends, status, APIRouter, UploadFile, File, Query
 from sqlalchemy.orm import Session
-import cloudinary
-import cloudinary.uploader
 from fastapi import HTTPException
 from typing import List
 
 from src.database.db import get_db
 from src.database.models import User
 from src.schemas import ImageResponse
+from src.edit_image_schemas import EditImageModel
 from src.services.auth import auth_service
-from src.config.config import settings
 from src.repository import pictures as repository_pictures
+from src.services.cloud_image import CloudImage
 
 
 
@@ -33,18 +32,11 @@ async def create_image(description: str,
     :param db: Session: A connection to our Postgres SQL database.
     :return: A image object
     '''
-    cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
-    r = cloudinary.uploader.upload(image_file.file)
-    image_url = r['secure_url']
-    new_image = await repository_pictures.create(description, image_url, current_user, db)
-    if new_image is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Image not created")
-    return new_image
+    file_name = CloudImage.generate_name_image()
+    CloudImage.upload(image_file.file, file_name, overwrite=False)
+    image_url = CloudImage.get_url_for_image(file_name)
+    image = await repository_pictures.create(description, image_url, current_user, db)
+    return image
 
 
 @router.get("/", response_model=List[ImageResponse], status_code=status.HTTP_200_OK)
@@ -100,3 +92,43 @@ async def remove_image(image_id: int,
     if image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
     return image
+
+
+@router.patch("/image_editor", response_model=ImageResponse, status_code=status.HTTP_201_CREATED)
+async def image_editor(image_id: int, 
+                       body: EditImageModel,
+                       current_user: User = Depends(auth_service.get_current_user),
+                       db: Session = Depends(get_db)):
+    '''
+    The **image_editor** function edits a single image from the database.
+
+    :param image_id: int: The id of the image to edit
+    :param body: EditImageModel: The body of the request
+    :param current_user: User: The user object
+    :param db: Session: A connection to our Postgres SQL database.
+    :return: A image object
+    '''
+    image = await repository_pictures.image_editor(image_id, body, current_user, db)
+    if image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+    return image
+
+
+@router.patch("/description/{image_id}", response_model=ImageResponse)
+async def edit_description(image_id: int,
+                            description: str,
+                            current_user: User = Depends(auth_service.get_current_user),
+                            db: Session = Depends(get_db)):
+     '''
+     The **edit_description** function edits the description of a single image from the database.
+    
+     :param image_id: int: The id of the image to edit
+     :param description: str: The description of the image
+     :param current_user: User: The user object
+     :param db: Session: A connection to our Postgres SQL database.
+     :return: A image object
+     '''
+     image = await repository_pictures.edit_description(image_id, description, current_user, db)
+     if image is None:
+          raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+     return image
