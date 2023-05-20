@@ -1,12 +1,9 @@
 .idea
-
 poetry.lock
-
-migrations
 __pycache__
 .pyc
-
+.example.env
 .env
-
 .DS_Store
 src/.DS_Store
+
