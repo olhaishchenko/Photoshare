@@ -148,6 +148,7 @@ async def image_editor(image_id: int,
             CloudImage()
             uri = cloudinary.CloudinaryImage(image.image_url).build_url(transformation=edit_data)
             image.image_url = uri
+            print(uri)
             db.commit()
             db.refresh(image)
             return image

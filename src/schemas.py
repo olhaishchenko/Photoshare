@@ -41,7 +41,6 @@ class UserResponse(BaseModel):
 #     created_at: datetime
 
 
-
 class TokenModel(BaseModel):
     access_token: str
     refresh_token: str
@@ -118,8 +117,22 @@ class ImageModel(ImageBase):
         orm_mode = True
 
 
-class ImageResponse(ImageModel):
+class ImageResponseCreated(ImageModel):
     detail: str = "Image successfully created"
+
+    class Config:
+        orm_mode = True
+
+
+class ImageResponseUpdated(ImageModel):
+    detail: str = "Image description successfully updated"
+
+    class Config:
+        orm_mode = True
+
+
+class ImageResponseEdited(ImageModel):
+    detail: str = "Image successfully edited"
 
     class Config:
         orm_mode = True

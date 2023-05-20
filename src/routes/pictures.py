@@ -5,7 +5,7 @@ from typing import List
 
 from src.database.db import get_db
 from src.database.models import User
-from src.schemas import ImageResponse
+from src.schemas import ImageModel, ImageResponseCreated, ImageResponseEdited, ImageResponseUpdated
 from src.edit_image_schemas import EditImageModel
 from src.services.auth import auth_service
 from src.repository import pictures as repository_pictures
@@ -16,7 +16,7 @@ from src.services.cloud_image import CloudImage
 router = APIRouter(prefix="/pictures", tags=['pictures'])
 
 
-@router.post("/", response_model=ImageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ImageResponseCreated, status_code=status.HTTP_201_CREATED)
 async def create_image(description: str,
                        image_file: UploadFile = File(),
                        current_user: User = Depends(auth_service.get_current_user),
@@ -39,7 +39,7 @@ async def create_image(description: str,
     return image
 
 
-@router.get("/", response_model=List[ImageResponse], status_code=status.HTTP_200_OK)
+@router.get("/", response_model=List[ImageModel], status_code=status.HTTP_200_OK)
 async def get_images(limit: int = Query(10, le=50), offset: int = 0,
                      current_user: User = Depends(auth_service.get_current_user),
                      db: Session = Depends(get_db)):
@@ -58,7 +58,7 @@ async def get_images(limit: int = Query(10, le=50), offset: int = 0,
     return images
 
 
-@router.get("/{image_id}", response_model=ImageResponse, status_code=status.HTTP_200_OK)
+@router.get("/{image_id}", response_model=ImageModel, status_code=status.HTTP_200_OK)
 async def get_image(image_id: int,
                     current_user: User = Depends(auth_service.get_current_user),
                     db: Session = Depends(get_db)):
@@ -94,7 +94,7 @@ async def remove_image(image_id: int,
     return image
 
 
-@router.patch("/image_editor", response_model=ImageResponse, status_code=status.HTTP_201_CREATED)
+@router.patch("/image_editor", response_model=ImageResponseEdited, status_code=status.HTTP_201_CREATED)
 async def image_editor(image_id: int, 
                        body: EditImageModel,
                        current_user: User = Depends(auth_service.get_current_user),
@@ -114,7 +114,7 @@ async def image_editor(image_id: int,
     return image
 
 
-@router.patch("/description/{image_id}", response_model=ImageResponse)
+@router.patch("/description/{image_id}", response_model=ImageResponseUpdated)
 async def edit_description(image_id: int,
                             description: str,
                             current_user: User = Depends(auth_service.get_current_user),
