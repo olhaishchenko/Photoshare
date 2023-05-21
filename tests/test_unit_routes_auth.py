@@ -114,5 +114,5 @@ def test_invalid_refresh_token_ok(client, session, user):
     assert response.status_code == 401, response.text
 
 
-if __name__ == '__main__':
-    unittest.main()
+# if __name__ == '__main__':
+#     unittest.main()
