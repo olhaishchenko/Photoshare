@@ -11,7 +11,7 @@ from src.repository.users import (
     get_me,
     make_user_role, get_user_by_email, confirmed_email, update_avatar, get_users, remove_from_users
 )
-from src.schemas import UpdateUser
+from src.schemas.users import UpdateUser
 
 
 class TestUsersRepos(unittest.IsolatedAsyncioTestCase):
