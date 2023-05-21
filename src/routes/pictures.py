@@ -5,8 +5,8 @@ from typing import List
 
 from src.database.db import get_db
 from src.database.models import User
-from src.schemas import ImageModel, ImageResponseCreated, ImageResponseEdited, ImageResponseUpdated
-from src.edit_image_schemas import EditImageModel
+from src.schemas.pictures import ImageModel, ImageResponseCreated, ImageResponseEdited, ImageResponseUpdated
+from src.schemas.pictures import EditImageModel
 from src.services.auth import auth_service
 from src.repository import pictures as repository_pictures
 from src.services.cloud_image import CloudImage

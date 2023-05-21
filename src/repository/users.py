@@ -4,7 +4,7 @@ from libgravatar import Gravatar
 from sqlalchemy.orm import Session
 
 from src.database.models import User, Image, Role, Comment
-from src.schemas import UserModel, UpdateUser
+from src.schemas.users import UserModel, UpdateUser
 
 
 async def get_me(user: User, db: Session) -> User:

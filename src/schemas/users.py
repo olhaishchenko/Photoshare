@@ -1,10 +1,9 @@
 from typing import Optional
-from datetime import datetime
-from fastapi import Depends
-from pydantic import BaseModel, Field, EmailStr, validator, BaseConfig
+from pydantic import BaseModel, Field, EmailStr, validator
 from pydantic.types import date
 
 from src.database.models import Role
+
 
 
 class UserModel(BaseModel):
@@ -78,61 +77,3 @@ class UserInfoResponse(BaseModel):
 class RequestRole(BaseModel):
     email: EmailStr
     roles: Role
-
-
-class CommentBase(BaseModel):
-    comment: str = Field(max_length=500)
-
-
-class CommentModel(CommentBase):
-    id: int
-    created_at: datetime
-    updated_at: Optional[datetime]
-    user_id: int
-    image_id: int
-
-    class Config:
-        orm_mode = True
-
-
-class CommentUpdate(CommentModel):
-    updated_at = datetime
-
-    class Config:
-        orm_mode = True
-
-
-class ImageBase(BaseModel):
-    image_url: str = Field(max_length=500)
-    description: Optional[str] = Field(max_length=500)
-
-
-class ImageModel(ImageBase):
-    id: int
-    created_at: datetime
-    updated_at: Optional[datetime]
-    user_id: int
-
-    class Config:
-        orm_mode = True
-
-
-class ImageResponseCreated(ImageModel):
-    detail: str = "Image successfully created"
-
-    class Config:
-        orm_mode = True
-
-
-class ImageResponseUpdated(ImageModel):
-    detail: str = "Image description successfully updated"
-
-    class Config:
-        orm_mode = True
-
-
-class ImageResponseEdited(ImageModel):
-    detail: str = "Image successfully edited"
-
-    class Config:
-        orm_mode = True

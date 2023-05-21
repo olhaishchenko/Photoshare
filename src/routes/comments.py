@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from src.database.db import get_db
-from src.schemas import CommentBase, CommentUpdate, CommentModel
+from src.schemas.comments import CommentBase, CommentUpdate, CommentModel
 from src.repository import comments as repository_comments
 from src.services.auth import auth_service
 from src.config import detail

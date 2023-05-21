@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc
 
 from src.database.models import User, Image
-from src.edit_image_schemas import EditImageModel
+from src.schemas.pictures import EditImageModel
 from src.services.cloud_image import CloudImage
 import cloudinary
 
