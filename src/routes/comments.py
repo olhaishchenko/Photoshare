@@ -18,7 +18,7 @@ allowed_edit_comments = CheckRole([Role.admin, Role.moderator, Role.user])
 allowed_delete_comments = CheckRole([Role.admin, Role.moderator])
 
 
-@router.post("/new/{post_id}",
+@router.post("/{post_id}",
              response_model=CommentModel,
              dependencies=[Depends(allowed_add_comments)])
 async def add_comment(image_id: int, body: CommentBase, db: Session = Depends(get_db),
@@ -36,7 +36,7 @@ async def add_comment(image_id: int, body: CommentBase, db: Session = Depends(ge
     return new_comment
 
 
-@router.put("/edit/{comment_id}",
+@router.put("/{comment_id}",
             response_model=CommentUpdate,
             dependencies=[Depends(allowed_edit_comments)])
 async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends(get_db),
@@ -56,7 +56,7 @@ async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends
     return edited_comment
 
 
-@router.delete("/delete/{comment_id}",
+@router.delete("/{comment_id}",
                response_model=CommentModel,
                dependencies=[Depends(allowed_delete_comments)])
 async def delete_comment(comment_id: int, db: Session = Depends(get_db),
