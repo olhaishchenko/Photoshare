@@ -18,7 +18,7 @@ allowed_edit_comments = CheckRole([Role.admin, Role.moderator, Role.user])
 allowed_delete_comments = CheckRole([Role.admin, Role.moderator])
 
 
-@router.post("/{image_id}",
+@router.post("/new/{post_id}",
              response_model=CommentModel,
              dependencies=[Depends(allowed_add_comments)])
 async def add_comment(image_id: int, body: CommentBase, db: Session = Depends(get_db),
@@ -36,7 +36,7 @@ async def add_comment(image_id: int, body: CommentBase, db: Session = Depends(ge
     return new_comment
 
 
-@router.put("/{comment_id}",
+@router.put("/edit/{comment_id}",
             response_model=CommentUpdate,
             dependencies=[Depends(allowed_edit_comments)])
 async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends(get_db),
@@ -56,7 +56,7 @@ async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends
     return edited_comment
 
 
-@router.delete("/{comment_id}",
+@router.delete("/delete/{comment_id}",
                response_model=CommentModel,
                dependencies=[Depends(allowed_delete_comments)])
 async def delete_comment(comment_id: int, db: Session = Depends(get_db),
@@ -125,7 +125,7 @@ async def user_comments_for_image(user_id: int, image_id: int, db: Session = Dep
     :param image_id: int: Get the comments for a specific image
     :param db: Session: Access the database
     :param current_user: User: Get the current user who is logged-in
-    :return: A list of comments that belong to an image
+    :return: A list of comments that belong to a post
     """
     comments = await repository_comments.get_user_comments_by_image(user_id, image_id, db)
     if comments is None:

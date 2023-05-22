@@ -1,4 +1,4 @@
-from fastapi import Depends, status, APIRouter, UploadFile, File, Query
+from fastapi import Depends, status, APIRouter, UploadFile, File, Query, Form
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from typing import List
@@ -18,7 +18,8 @@ router = APIRouter(prefix="/pictures", tags=['pictures'])
 
 @router.post("/", response_model=ImageResponseCreated, status_code=status.HTTP_201_CREATED)
 async def create_image(description: str,
-                       image_file: UploadFile = File(),
+                       tags: str = None,
+                       image_file: UploadFile = File(...),
                        current_user: User = Depends(auth_service.get_current_user),
                        db: Session = Depends(get_db)):
     '''
@@ -27,6 +28,7 @@ async def create_image(description: str,
     The image file is uploaded to Cloudinary and the url is stored in the database.
     
     :param description: str: The description of the image
+    :param tags: TagModelAddToPicture: 5 tags
     :param image_file: UploadFile: The image file
     :param current_user: User: The user object
     :param db: Session: A connection to our Postgres SQL database.
@@ -35,7 +37,7 @@ async def create_image(description: str,
     file_name = CloudImage.generate_name_image()
     CloudImage.upload(image_file.file, file_name, overwrite=False)
     image_url = CloudImage.get_url_for_image(file_name)
-    image = await repository_pictures.create(description, image_url, current_user, db)
+    image = await repository_pictures.create(description, tags, image_url, current_user, db)
     return image
 
 
@@ -95,7 +97,7 @@ async def remove_image(image_id: int,
 
 
 @router.patch("/image_editor", response_model=ImageResponseEdited, status_code=status.HTTP_201_CREATED)
-async def image_editor(image_id: int, 
+async def image_editor(image_id: int,
                        body: EditImageModel,
                        current_user: User = Depends(auth_service.get_current_user),
                        db: Session = Depends(get_db)):
@@ -121,7 +123,7 @@ async def edit_description(image_id: int,
                             db: Session = Depends(get_db)):
      '''
      The **edit_description** function edits the description of a single image from the database.
-    
+
      :param image_id: int: The id of the image to edit
      :param description: str: The description of the image
      :param current_user: User: The user object
