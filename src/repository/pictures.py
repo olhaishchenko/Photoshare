@@ -1,28 +1,53 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc
 
-from src.database.models import User, Image
+from src.database.models import User, Image, Tag, TagsImages
 from src.edit_image_schemas import EditImageModel
+
 from src.services.cloud_image import CloudImage
 import cloudinary
 
 
+def create_taglist(tags: str) -> list:
+    return [tg for tg in tags.strip().split(' ') if '#' in tg][:5]
 
 
-async def create(description: str, image_url: str, user: User, db: Session):
-    '''
+async def add_tags_to_db(tags: str, image, db):
+    """
+    Add new tags in db
+    """
+    tag_list = create_taglist(tags)
+    for tg in tag_list:
+        if not db.query(Tag).filter_by(tag=tg).first():
+            new_tag = Tag(tag=tg)
+            db.add(new_tag)
+            db.commit()
+            db.refresh(new_tag)
+        else:
+            new_tag = db.query(Tag).filter(Tag.tag == tg).first()
+        tag_pic = TagsImages(image_id=image.id, tag_id=new_tag.id)
+        db.add(tag_pic)
+        db.commit()
+        db.refresh(tag_pic)
+
+
+async def create(description: str, tags, image_url: str, user: User, db: Session):
+    """
     The **create** function creates a new image in the database.
-
+    :param tags: tags to add
     :param description: str: The description of the image
     :param image_url: str: The url of the image
     :param user: User: The user object
     :param db: Session: A connection to our Postgres SQL database.
     :return: A image object
-    '''
+    """
     image = Image(description=description, image_url=image_url, user_id=user.id)
     db.add(image)
     db.commit()
     db.refresh(image)
+    await add_tags_to_db(tags, image, db)
+
+
     return image
 
 
@@ -36,7 +61,7 @@ async def get_images(limit: int, offset: int, user: User, db: Session):
     :param db: Session: A connection to our Postgres SQL database.
     :return: A list of image objects
     '''
-    images = db.query(Image).filter(and_(Image.user_id == user.id)).\
+    images = db.query(Image).filter(and_(Image.user_id == user.id)). \
         order_by(desc(Image.created_at)).limit(limit).offset(offset).all()
     return images
 
@@ -50,7 +75,7 @@ async def get_image(image_id: int, user: User, db: Session):
     :param db: Session: A connection to our Postgres SQL database.
     :return: A image object
     '''
-    image = db.query(Image).filter(and_(Image.user_id == user.id, Image.id == image_id)).\
+    image = db.query(Image).filter(and_(Image.user_id == user.id, Image.id == image_id)). \
         order_by(desc(Image.created_at)).first()
     return image
 
@@ -96,7 +121,7 @@ async def remove(image_id: int, user: User, db: Session):
     return image
 
 
-async def image_editor(image_id: int, 
+async def image_editor(image_id: int,
                        body: EditImageModel,
                        user: User,
                        db: Session):
@@ -113,8 +138,9 @@ async def image_editor(image_id: int,
     if image:
         edit_data = []
         if body.circle.use_filter and body.circle.height and body.circle.width:
-            trans_list = [{'gravity': "face", 'height': f"{body.circle.height}", 'width': f"{body.circle.width}", 'crop': "thumb"},
-            {'radius': "max"}]
+            trans_list = [{'gravity': "face", 'height': f"{body.circle.height}", 'width': f"{body.circle.width}",
+                           'crop': "thumb"},
+                          {'radius': "max"}]
             [edit_data.append(elem) for elem in trans_list]
 
         if body.effect.use_filter:
@@ -137,11 +163,13 @@ async def image_editor(image_id: int,
             if body.resize.fill:
                 crop = "fill"
             if crop:
-                trans_list = [{"gravity": "auto", 'height': f"{body.resize.height}", 'width': f"{body.resize.width}", 'crop': f"{crop}"}]
+                trans_list = [{"gravity": "auto", 'height': f"{body.resize.height}", 'width': f"{body.resize.width}",
+                               'crop': f"{crop}"}]
                 [edit_data.append(elem) for elem in trans_list]
 
         if body.rotate.use_filter and body.rotate.width and body.rotate.degree:
-            trans_list = [{'width': f"{body.rotate.width}", 'crop': "scale"}, {'angle': "vflip"}, {'angle': f"{body.rotate.degree}"}]
+            trans_list = [{'width': f"{body.rotate.width}", 'crop': "scale"}, {'angle': "vflip"},
+                          {'angle': f"{body.rotate.degree}"}]
             [edit_data.append(elem) for elem in trans_list]
 
         if edit_data:
@@ -154,7 +182,7 @@ async def image_editor(image_id: int,
             return image
 
 
-async def edit_description(image_id: int, 
+async def edit_description(image_id: int,
                            description: str,
                            user: User,
                            db: Session):

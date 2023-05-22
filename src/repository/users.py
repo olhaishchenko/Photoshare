@@ -121,6 +121,18 @@ async def update_user_info(email, body: UpdateUser, db: Session):
     return user
 
 
+# async def create_one_user(body: UserModel, db: Session):
+#     new_user = User(**body.dict())
+#     db.add(new_user)
+#     db.commit()
+#     db.refresh(new_user)
+#     return new_user
+
+
+# async def get_one_user(id_, db: Session):
+#     return db.query(User).filter(User.id == id_).first()
+
+
 async def get_user_info(current_user, db):
     """
     Get username of current user, when he join and number of images he have
@@ -195,6 +207,24 @@ async def get_users(skip: int, limit: int, db: Session) -> List[User]:
     :return: A list of users
     """
     return db.query(User).offset(skip).limit(limit).all()
+
+
+# async def get_all_liked_images(user: User, db: Session):
+#     """
+#     The **get_all_liked_images** function returns all images that a user has liked.
+#         Args:
+#             user (User): The User object to get the liked images for.
+#             db (Session): A database session to use for querying the database.
+#         Returns:
+#             List[Image]: A list of Image objects that have been liked by the specified User.
+#
+#     :param user: User: Get the user's id
+#     :param db: Session: Pass the database session to the function
+#     :return: A list of images that the user liked
+#     """
+#     pass
+#     # TODO: Implement after image part is ready
+#     # return db.query(Image).join(Rating).filter(Rating.user_id == user.id).all()
 
 
 async def get_all_commented_images(user: User, db: Session):

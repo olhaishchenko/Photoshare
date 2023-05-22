@@ -55,7 +55,7 @@ async def update_user_info(body: UpdateUser, current_user: User = Depends(auth_s
     return user
 
 
-@user_router.delete('/{user_id}/', dependencies=[Depends(allowed_remove_user)])
+@user_router.delete('/{user_id}', dependencies=[Depends(allowed_remove_user)])
 async def user_remove(user_id, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
     """
     Ban user
@@ -162,6 +162,23 @@ async def read_commented_images_by_me(db: Session = Depends(get_db),
     :return: A list of images that the user has commented on
     """
     images = await repository_users.get_all_commented_images(current_user, db)
+    if not images:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail.NOT_FOUND)
+    return images
+
+
+@user_router.get("/rated_images_by_me/", response_model=List[ImageModel])
+async def read_liked_images_by_me(db: Session = Depends(get_db),
+                                 current_user: User = Depends(auth_service.get_current_user)):
+    """
+    The **read_liked_images_by_me** function returns all images liked by the current user.
+        The function is called when a GET request is made to the /users/me/liked_images endpoint.
+
+    :param db: Session: Pass the database connection to the function
+    :param current_user: User: Get the user object of the current logged in user
+    :return: A list of images that the user liked
+    """
+    images = await repository_users.get_all_liked_images(current_user, db)
     if not images:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail.NOT_FOUND)
     return images

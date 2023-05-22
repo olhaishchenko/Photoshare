@@ -52,7 +52,7 @@ class RequestEmail(BaseModel):
 
 
 class UpdateUser(BaseModel):
-    username: Optional[str]
+    username: Optional[str] = None
     email: Optional[EmailStr] = None
 
     @validator('email', pre=True, always=True)
@@ -136,3 +136,16 @@ class ImageResponseEdited(ImageModel):
 
     class Config:
         orm_mode = True
+
+
+# class TagModelAddToPicture(BaseModel):
+#     tag1: str = ''
+#     tag2: str = ''
+#     tag3: str = ''
+#     tag4: str = ''
+#     tag5: str = ''
+#
+#     def to_list(self):
+#         return [self.tag1, self.tag2, self.tag3, self.tag4, self.tag5]
+
+

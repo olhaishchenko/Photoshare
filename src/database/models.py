@@ -1,7 +1,7 @@
 import enum
 
-
 from sqlalchemy import Boolean, Column, Table, Integer, String, Date, Enum, ForeignKey, DateTime, func
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -14,11 +14,13 @@ class Role(enum.Enum):
     user: str = 'user'
 
 
+class TagsImages(Base):
+    __tablename__ = "tags_images"
+    id = Column(Integer, primary_key=True)
+    image_id = Column('image_id', Integer, ForeignKey('images.id'))
+    tag_id = Column('tag_id', Integer, ForeignKey('tags.id'))
 
-tags_images = Table('tags_images', Base.metadata,
-                    Column('image_id', ForeignKey('images.id'), primary_key=True),
-                    Column('tag_id', ForeignKey('tags.id'), primary_key=True)
-                    )
+
 
 class Image(Base):
     __tablename__ = "images"
@@ -30,10 +32,12 @@ class Image(Base):
     description = Column(String(255))
     user = relationship('User', backref="images")
 
+
 class Tag(Base):
     __tablename__ = "tags"
     id = Column(Integer, primary_key=True, index=True)
     tag = Column(String, unique=True)
+
 
 # class Rating(Base):
 #     __tablename__ = "ratings"

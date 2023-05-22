@@ -125,7 +125,7 @@ async def user_comments_for_image(user_id: int, image_id: int, db: Session = Dep
     :param image_id: int: Get the comments for a specific image
     :param db: Session: Access the database
     :param current_user: User: Get the current user who is logged-in
-    :return: A list of comments that belong to an image
+    :return: A list of comments that belong to a image
     """
     comments = await repository_comments.get_user_comments_by_image(user_id, image_id, db)
     if comments is None:
