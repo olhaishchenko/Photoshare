@@ -4,15 +4,14 @@ from sqlalchemy import and_, desc
 from src.database.models import User, Image
 from src.schemas.pictures import EditImageModel
 from src.services.cloud_image import CloudImage
-import cloudinary
-import pyqrcode
+from cloudinary import CloudinaryImage
 import qrcode
 
 
 
 
 
-async def create(description: str, image_url: str, user: User, db: Session):
+async def create(description: str, image_url: str, public_id: str, user: User, db: Session):
     '''
     The **create** function creates a new image in the database.
 
@@ -22,7 +21,7 @@ async def create(description: str, image_url: str, user: User, db: Session):
     :param db: Session: A connection to our Postgres SQL database.
     :return: A image object
     '''
-    image = Image(description=description, image_url=image_url, user_id=user.id)
+    image = Image(description=description, image_url=image_url, public_id=public_id, user_id=user.id)
     db.add(image)
     db.commit()
     db.refresh(image)
@@ -149,9 +148,8 @@ async def image_editor(image_id: int,
 
         if edit_data:
             CloudImage()
-            uri = cloudinary.CloudinaryImage(image.image_url).build_url(transformation=edit_data)
-            image.image_url = uri
-            print(uri)
+            new_image = CloudinaryImage(image.public_id).image(transformation=edit_data)
+            image.image_url = new_image
             db.commit()
             db.refresh(image)
             return image
