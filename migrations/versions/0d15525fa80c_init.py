@@ -1,8 +1,8 @@
 """Init
 
-Revision ID: 77a8d1025a59
+Revision ID: 0d15525fa80c
 Revises: 
-Create Date: 2023-05-15 19:59:11.266216
+Create Date: 2023-05-22 16:14:56.714390
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '77a8d1025a59'
+revision = '0d15525fa80c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -41,12 +41,15 @@ def upgrade() -> None:
     )
     op.create_table('images',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('description', sa.String(), nullable=False),
+    sa.Column('image_url', sa.String(length=255), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('description', sa.String(length=255), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('image_url')
     )
-    op.create_index(op.f('ix_images_id'), 'images', ['id'], unique=False)
     op.create_table('comments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('comment', sa.String(), nullable=False),
@@ -61,11 +64,11 @@ def upgrade() -> None:
     op.create_index(op.f('ix_comments_id'), 'comments', ['id'], unique=False)
     op.create_table('tags_images',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('image_id', sa.Integer(), nullable=False),
-    sa.Column('tag_id', sa.Integer(), nullable=False),
+    sa.Column('image_id', sa.Integer(), nullable=True),
+    sa.Column('tag_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['image_id'], ['images.id'], ),
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], ),
-    sa.PrimaryKeyConstraint('id', 'image_id', 'tag_id')
+    sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
 
@@ -75,7 +78,6 @@ def downgrade() -> None:
     op.drop_table('tags_images')
     op.drop_index(op.f('ix_comments_id'), table_name='comments')
     op.drop_table('comments')
-    op.drop_index(op.f('ix_images_id'), table_name='images')
     op.drop_table('images')
     op.drop_table('users')
     op.drop_index(op.f('ix_tags_id'), table_name='tags')

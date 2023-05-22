@@ -15,7 +15,6 @@ def create_taglist(tags: str) -> list:
 async def add_tags_to_db(tags: str, image, db):
     """
     Add new tags in db
-
     """
     tag_list = create_taglist(tags)
     for tg in tag_list:
@@ -23,11 +22,13 @@ async def add_tags_to_db(tags: str, image, db):
             new_tag = Tag(tag=tg)
             db.add(new_tag)
             db.commit()
+            db.refresh(new_tag)
         else:
             new_tag = db.query(Tag).filter(Tag.tag == tg).first()
         tag_pic = TagsImages(image_id=image.id, tag_id=new_tag.id)
         db.add(tag_pic)
         db.commit()
+        db.refresh(tag_pic)
 
 
 async def create(description: str, tags, image_url: str, user: User, db: Session):
