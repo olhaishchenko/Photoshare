@@ -5,6 +5,9 @@ from src.database.models import User, Image
 from src.schemas.pictures import EditImageModel
 from src.services.cloud_image import CloudImage
 import cloudinary
+import pyqrcode
+import qrcode
+
 
 
 
@@ -173,3 +176,31 @@ async def edit_description(image_id: int,
         db.commit()
         db.refresh(image)
         return image
+    
+
+async def qr_code_generator(image_id: int, 
+                            user: User,
+                            db: Session):
+    '''
+    The **qr_code_generator** function edits a single image from the database.
+    
+    :param image_id: int: The id of the image to edit
+    :param user: User: The user object
+    :param db: Session: A connection to our Postgres SQL database.
+    :return: A image object
+    '''
+    image = await get_image_from_id(image_id, user, db)
+    if image:
+        image_url = image.image_url
+        qr = qrcode.QRCode(
+            version=1,
+            box_size=10,
+            border=5
+        )
+        qr.add_data(image_url)
+        qr.make(fit=True)
+        img = qr.make_image(fill='black', back_color='white')
+        img.save(f"qr_code_{image_id}.png")
+        return f"qr_code_{image_id}.png"
+    
+

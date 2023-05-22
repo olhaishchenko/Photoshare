@@ -132,3 +132,21 @@ async def edit_description(image_id: int,
      if image is None:
           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
      return image
+
+
+@router.post("/qr_code", status_code=status.HTTP_201_CREATED)
+async def generate_qr_code(image_id: int, 
+                            current_user: User = Depends(auth_service.get_current_user),
+                            db: Session = Depends(get_db)):
+     '''
+     The **generate_qr_code** function generates a QR code for a single image from the database.
+    
+     :param image_id: int: The id of the image to generate a QR code for
+     :param current_user: User: The user object
+     :param db: Session: A connection to our Postgres SQL database.
+     :return: A image object
+     '''
+     image = await repository_pictures.qr_code_generator(image_id, current_user, db)
+     if image is None:
+          raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+     return image
