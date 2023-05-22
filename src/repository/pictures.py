@@ -200,6 +200,13 @@ async def qr_code_generator(image_id: int,
         qr.add_data(image_url)
         qr.make(fit=True)
         img = qr.make_image(fill='black', back_color='white')
-        return img
+        img.save(f'./src/services/qr_codes/{image_id}.png')
+        image.qr_code_url = f'./src/services/qr_codes/{image_id}.png'
+        db.commit()
+        db.refresh(image)
+        return image
+    
+    
+
     
 
