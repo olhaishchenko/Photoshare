@@ -200,7 +200,6 @@ async def qr_code_generator(image_id: int,
         qr.add_data(image_url)
         qr.make(fit=True)
         img = qr.make_image(fill='black', back_color='white')
-        img.save(f"qr_code_{image_id}.png")
-        return f"qr_code_{image_id}.png"
+        return img
     
 
