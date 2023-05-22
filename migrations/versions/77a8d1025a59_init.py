@@ -60,11 +60,12 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_comments_id'), 'comments', ['id'], unique=False)
     op.create_table('tags_images',
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('image_id', sa.Integer(), nullable=False),
     sa.Column('tag_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['image_id'], ['images.id'], ),
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], ),
-    sa.PrimaryKeyConstraint('image_id', 'tag_id')
+    sa.PrimaryKeyConstraint('id', 'image_id', 'tag_id')
     )
     # ### end Alembic commands ###
 
