@@ -15,6 +15,7 @@ import qrcode
 
 
 def create_taglist(tags: str) -> list:
+
     return [tg for tg in tags.strip().split(' ') if '#' in tg][:5]
 
 
@@ -22,9 +23,7 @@ def create_taglist(tags: str) -> list:
 
 
 async def add_tags_to_db(tags: str, image, db):
-    """
-    Add new tags in db
-    """
+
     tag_list = create_taglist(tags)
     for tg in tag_list:
         if not db.query(Tag).filter_by(tag=tg).first():

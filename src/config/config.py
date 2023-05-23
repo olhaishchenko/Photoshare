@@ -2,6 +2,7 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+
     sqlalchemy_database_url: str
     secret_key: str
     algorithm: str
@@ -17,6 +18,7 @@ class Settings(BaseSettings):
     cloudinary_api_secret: str
 
     class Config:
+        case_sensitive = True
         env_file = ".env"
         env_file_encoding = "utf-8"
 
