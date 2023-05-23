@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field, EmailStr, validator
 from pydantic.types import date
@@ -51,7 +52,7 @@ class RequestEmail(BaseModel):
 
 
 class UpdateUser(BaseModel):
-    username: Optional[str]
+    username: Optional[str] = None
     email: Optional[EmailStr] = None
 
     @validator('email', pre=True, always=True)
@@ -77,3 +78,75 @@ class UserInfoResponse(BaseModel):
 class RequestRole(BaseModel):
     email: EmailStr
     roles: Role
+
+
+
+class CommentBase(BaseModel):
+    comment: str = Field(max_length=500)
+
+
+class CommentModel(CommentBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+    user_id: int
+    image_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class CommentUpdate(CommentModel):
+    updated_at = datetime
+
+    class Config:
+        orm_mode = True
+
+
+class ImageBase(BaseModel):
+    image_url: str = Field(max_length=500)
+    description: Optional[str] = Field(max_length=500)
+
+
+class ImageModel(ImageBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+    user_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class ImageResponseCreated(ImageModel):
+    detail: str = "Image successfully created"
+
+    class Config:
+        orm_mode = True
+
+
+class ImageResponseUpdated(ImageModel):
+    detail: str = "Image description successfully updated"
+
+    class Config:
+        orm_mode = True
+
+
+class ImageResponseEdited(ImageModel):
+    detail: str = "Image successfully edited"
+
+    class Config:
+        orm_mode = True
+
+
+# class TagModelAddToPicture(BaseModel):
+#     tag1: str = ''
+#     tag2: str = ''
+#     tag3: str = ''
+#     tag4: str = ''
+#     tag5: str = ''
+#
+#     def to_list(self):
+#         return [self.tag1, self.tag2, self.tag3, self.tag4, self.tag5]
+
+

@@ -23,7 +23,7 @@ allowed_ban_user = CheckRole([Role.admin])
 allowed_change_user_role = CheckRole([Role.admin])
 
 
-@user_router.get("/me/", response_model=UserDb, dependencies=[Depends(allowed_all_user)])
+@user_router.get("/me", response_model=UserDb, dependencies=[Depends(allowed_all_user)])
 async def read_users_me(current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     """
     The **read_users_me** function is a GET endpoint that returns the current user's information.
@@ -36,7 +36,7 @@ async def read_users_me(current_user: User = Depends(auth_service.get_current_us
     return user
 
 
-@user_router.put('/edit', response_model=UserDb, dependencies=[Depends(allowed_all_user)])
+@user_router.patch('/me/', response_model=UserDb, dependencies=[Depends(allowed_all_user)])
 async def update_user_info(body: UpdateUser, current_user: User = Depends(auth_service.get_current_user),
                            db: Session = Depends(get_db)):
     """
@@ -56,8 +56,8 @@ async def update_user_info(body: UpdateUser, current_user: User = Depends(auth_s
     return user
 
 
-@user_router.put('/remove', dependencies=[Depends(allowed_remove_user)])
-async def user_remove(id_, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
+@user_router.delete('/{user_id}', dependencies=[Depends(allowed_remove_user)])
+async def user_remove(user_id, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
     """
     Ban user
 
@@ -68,11 +68,11 @@ async def user_remove(id_, db: Session = Depends(get_db), current_user: User = D
     :return: banned user info with message of success
     :rtype: dict
     """
-    await repository_users.remove_from_users(id_, db)
-    return {"user_id": id_, "detail": detail.USER_REMOVE}
+    await repository_users.remove_from_users(user_id, db)
+    return {"user_id": user_id, "detail": detail.USER_REMOVE}
 
 
-@user_router.get('/info', response_model=UserInfoResponse, dependencies=[Depends(allowed_all_user)])
+@user_router.get('/info/', response_model=UserInfoResponse, dependencies=[Depends(allowed_all_user)])
 async def user_info(db: Session = Depends(get_db),
                     current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -89,7 +89,7 @@ async def user_info(db: Session = Depends(get_db),
     return user_info
 
 
-@user_router.put('/ban/{id_}', response_model=UserBanned, dependencies=[Depends(allowed_ban_user)])
+@user_router.put('/ban/{id_}/', response_model=UserBanned, dependencies=[Depends(allowed_ban_user)])
 async def ban_user(id_, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
     """
     Ban user
@@ -108,7 +108,7 @@ async def ban_user(id_, db: Session = Depends(get_db), current_user: User = Depe
     return {"user": banned_user, "detail": detail.USER_BANNED}
 
 
-@user_router.get("/all", response_model=List[UserDb], dependencies=[Depends(allowed_get_all_users)])
+@user_router.get("/all/", response_model=List[UserDb], dependencies=[Depends(allowed_get_all_users)])
 async def read_all_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     """
     The **read_all_users** function returns a list of users.
