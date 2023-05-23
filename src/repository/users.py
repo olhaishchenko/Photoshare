@@ -223,7 +223,6 @@ async def get_users(skip: int, limit: int, db: Session) -> List[User]:
 #     :return: A list of images that the user liked
 #     """
 #     pass
-#     # TODO: Implement after image part is ready
 #     # return db.query(Image).join(Rating).filter(Rating.user_id == user.id).all()
 
 
