@@ -17,8 +17,9 @@ class Role(enum.Enum):
 class TagsImages(Base):
     __tablename__ = "tags_images"
     id = Column(Integer, primary_key=True)
-    image_id = Column('image_id', Integer, ForeignKey('images.id'))
-    tag_id = Column('tag_id', Integer, ForeignKey('tags.id'))
+    image_id = Column('image_id', Integer, ForeignKey('images.id', ondelete="CASCADE"))
+    tag_id = Column('tag_id', Integer, ForeignKey('tags.id', ondelete="CASCADE"))
+
 
 
 
