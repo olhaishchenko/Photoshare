@@ -1,4 +1,4 @@
-from fastapi import Depends, status, APIRouter, UploadFile, File, Query, Form
+from fastapi import Depends, status, APIRouter, UploadFile, File, Query
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from typing import List
@@ -36,7 +36,7 @@ async def create_image(description: str,
     public_id = CloudImage.generate_name_image()
     CloudImage.upload(image_file.file, public_id, overwrite=False)
     image_url = CloudImage.get_url_for_image(public_id)
-    image = await repository_pictures.create(description, image_url, public_id, current_user, db)
+    image = await repository_pictures.create(description, tags, image_url, public_id, current_user, db)
 
     return image
 
