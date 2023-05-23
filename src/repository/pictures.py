@@ -1,15 +1,24 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc
 
+
+from src.database.models import User, Image
+from src.schemas.pictures import EditImageModel
+
 from src.database.models import User, Image, Tag, TagsImages
-from src.edit_image_schemas import EditImageModel
+
+
 
 from src.services.cloud_image import CloudImage
-import cloudinary
+from cloudinary import CloudinaryImage
+import qrcode
 
 
 def create_taglist(tags: str) -> list:
     return [tg for tg in tags.strip().split(' ') if '#' in tg][:5]
+
+
+
 
 
 async def add_tags_to_db(tags: str, image, db):
@@ -31,7 +40,7 @@ async def add_tags_to_db(tags: str, image, db):
         db.refresh(tag_pic)
 
 
-async def create(description: str, tags, image_url: str, user: User, db: Session):
+async def create(description: str, tags, image_url: str, public_id: str, user: User, db: Session):
     """
     The **create** function creates a new image in the database.
     :param tags: tags to add
@@ -41,7 +50,7 @@ async def create(description: str, tags, image_url: str, user: User, db: Session
     :param db: Session: A connection to our Postgres SQL database.
     :return: A image object
     """
-    image = Image(description=description, image_url=image_url, user_id=user.id)
+    image = Image(description=description, image_url=image_url, public_id=public_id, user_id=user.id)
     db.add(image)
     db.commit()
     db.refresh(image)
@@ -174,9 +183,8 @@ async def image_editor(image_id: int,
 
         if edit_data:
             CloudImage()
-            uri = cloudinary.CloudinaryImage(image.image_url).build_url(transformation=edit_data)
-            image.image_url = uri
-            print(uri)
+            new_image = CloudinaryImage(image.public_id).image(transformation=edit_data)
+            image.image_url = new_image
             db.commit()
             db.refresh(image)
             return image
@@ -198,6 +206,34 @@ async def edit_description(image_id: int,
     image = await get_image_from_id(image_id, user, db)
     if image:
         image.description = description
+        db.commit()
+        db.refresh(image)
+        return image
+
+async def qr_code_generator(image_id: int, 
+                            user: User,
+                            db: Session):
+    '''
+    The **qr_code_generator** function edits a single image from the database.
+    
+    :param image_id: int: The id of the image to edit
+    :param user: User: The user object
+    :param db: Session: A connection to our Postgres SQL database.
+    :return: A image object
+    '''
+    image = await get_image_from_id(image_id, user, db)
+    if image:
+        image_url = image.image_url
+        qr = qrcode.QRCode(
+            version=1,
+            box_size=10,
+            border=5
+        )
+        qr.add_data(image_url)
+        qr.make(fit=True)
+        img = qr.make_image(fill='black', back_color='white')
+        img.save(f'./src/services/qr_codes/{image_id}.png')
+        image.qr_code_url = f'./src/services/qr_codes/{image_id}.png'
         db.commit()
         db.refresh(image)
         return image

@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from src.config import detail
 from src.database.db import get_db
 from src.database.models import User, Role
-from src.schemas import UserDb, UpdateUser, UserInfoResponse, UserBanned, RequestRole, ImageModel
+from src.schemas.users import UserDb, UpdateUser, UserInfoResponse, UserBanned, RequestRole
+from src.schemas.pictures import ImageModel
 from src.services.auth import auth_service
 from src.services.roles import CheckRole
 from src.repository import users as repository_users

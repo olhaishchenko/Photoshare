@@ -1,10 +1,10 @@
-from typing import Optional
 from datetime import datetime
-from fastapi import Depends
-from pydantic import BaseModel, Field, EmailStr, validator, BaseConfig
+from typing import Optional
+from pydantic import BaseModel, Field, EmailStr, validator
 from pydantic.types import date
 
 from src.database.models import Role
+
 
 
 class UserModel(BaseModel):
@@ -78,6 +78,7 @@ class UserInfoResponse(BaseModel):
 class RequestRole(BaseModel):
     email: EmailStr
     roles: Role
+
 
 
 class CommentBase(BaseModel):

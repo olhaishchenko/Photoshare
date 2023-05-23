@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, func
 
 from src.database.models import User, Comment, Role
-from src.schemas import CommentBase
+from src.schemas.comments import CommentBase
 
 
 async def add_comment(image_id: int, body: CommentBase, db: Session, user: User) -> Comment:
