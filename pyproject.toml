@@ -33,6 +33,7 @@ qrcode = "^7.4.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
+sphinx = "^7.0.1"
 
 [build-system]
 requires = ["poetry-core"]
