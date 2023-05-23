@@ -1,9 +1,14 @@
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from fastapi_limiter import FastAPILimiter
+from fastapi_limiter import FastAPILimiter, default_identifier
 import redis.asyncio as redis
 import uvicorn
+from fastapi_limiter.depends import RateLimiter
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -21,8 +26,6 @@ async def startup():
 
     :return: None
     """
-    r = await redis.Redis(host=settings.redis_host, port=settings.redis_port, db=0)
-    await FastAPILimiter.init(r)
 
 
 app.add_middleware(
@@ -71,7 +74,6 @@ app.include_router(auth.router, prefix='/api')
 app.include_router(users.user_router, prefix='/api')
 app.include_router(comments.router, prefix='/api')
 app.include_router(pictures.router, prefix='/api')
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8000)
