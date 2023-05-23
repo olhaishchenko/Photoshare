@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 
 from src.database.models import User, Comment, Image
-from src.schemas import CommentBase
+from src.schemas.comments import CommentBase
 from src.repository import comments as repository_comments
 
 

@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     cloudinary_api_secret: str
 
     class Config:
-        case_sensitive = True
         env_file = ".env"
         env_file_encoding = "utf-8"
 
