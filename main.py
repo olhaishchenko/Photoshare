@@ -26,6 +26,14 @@ async def startup():
 
     :return: None
     """
+    r = await redis.Redis(
+        host=settings.redis_host,
+        port=settings.redis_port,
+        db=0,
+        encoding="utf-8",
+        decode_responses=True,
+    )
+    await FastAPILimiter.init(r)
 
 
 app.add_middleware(
