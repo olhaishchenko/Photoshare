@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, AsyncMock
 
 import pytest
 
@@ -20,6 +20,9 @@ def token(client, user, session, monkeypatch):
     """
     mock_send_email = MagicMock()
     monkeypatch.setattr("src.routes.auth.send_email", mock_send_email)
+    monkeypatch.setattr('fastapi_limiter.FastAPILimiter.redis', AsyncMock())
+    monkeypatch.setattr('fastapi_limiter.FastAPILimiter.identifier', AsyncMock())
+    monkeypatch.setattr('fastapi_limiter.FastAPILimiter.http_callback', AsyncMock())
     client.post("/api/auth/signup", json=user)
     current_user: User = session.query(User).filter(User.email == user.get('email')).first()
     current_user.confirmed = True
